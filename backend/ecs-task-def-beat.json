@@ -1,0 +1,58 @@
+{
+    "family": "backend-staging-beat",
+    "networkMode": "awsvpc",
+    "requiresCompatibilities": ["FARGATE"],
+    "cpu": "256",
+    "memory": "512",
+    "executionRoleArn": "arn:aws:iam::962183815893:role/ecsTaskExecutionRole",
+    "taskRoleArn": "arn:aws:iam::962183815893:role/ecsTaskExecutionRole",
+    "containerDefinitions": [
+      {
+        "name": "backend-app",
+        "image": "962183815893.dkr.ecr.us-west-2.amazonaws.com/backend-staging:latest",
+        "command": ["beat"],
+        "essential": true,
+        "secrets": [
+            { "name": "FLASK_APP",                 "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:FLASK_APP::" },
+            { "name": "FLASK_ENV",                 "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:FLASK_ENV::" },
+            { "name": "SECRET_KEY",                "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:SECRET_KEY::" },
+            { "name": "UPLOAD_FOLDER",             "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:UPLOAD_FOLDER::" },
+            { "name": "ALLOWED_EXTENSIONS",        "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:ALLOWED_EXTENSIONS::" },
+            { "name": "DATABASE_URL",              "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:DATABASE_URL::" },
+            { "name": "CELERY_BROKER_URL",         "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:CELERY_BROKER_URL::" },
+            { "name": "CELERY_RESULT_BACKEND",     "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:CELERY_RESULT_BACKEND::" },
+            { "name": "AWS_ACCESS_KEY_ID",         "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:AWS_ACCESS_KEY_ID::" },
+            { "name": "AWS_SECRET_ACCESS_KEY",     "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:AWS_SECRET_ACCESS_KEY::" },
+            { "name": "S3_ENDPOINT_URL",           "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:S3_ENDPOINT_URL::" },
+            { "name": "S3_BUCKET_NAME",            "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:S3_BUCKET_NAME::" },
+            { "name": "FRONTEND_URL",              "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:FRONTEND_URL::" },
+            { "name": "SENTRY_DSN",                "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:SENTRY_DSN::" },
+            { "name": "MAIL_USERNAME",             "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:MAIL_USERNAME::" },
+            { "name": "MAIL_PASSWORD",             "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:MAIL_PASSWORD::" },
+            { "name": "GOOGLE_CLIENT_ID",          "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:GOOGLE_CLIENT_ID::" },
+            { "name": "GOOGLE_CLIENT_SECRET",      "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:GOOGLE_CLIENT_SECRET::" },
+            { "name": "GOOGLE_AUTH_REDIRECT_URI",  "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:GOOGLE_AUTH_REDIRECT_URI::" },
+            { "name": "TWILIO_ACCOUNT_SID",        "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:TWILIO_ACCOUNT_SID::" },
+            { "name": "TWILIO_AUTH_TOKEN",         "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:TWILIO_AUTH_TOKEN::" },
+            { "name": "TWILIO_VERIFY_SERVICE_SID", "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:TWILIO_VERIFY_SERVICE_SID::" },
+            { "name": "USE_LOCALSTACK",            "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:USE_LOCALSTACK::" },
+            { "name": "PERFORM_STARTUP_FETCH",     "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:PERFORM_STARTUP_FETCH::" },
+            { "name": "APP_ENV",                   "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:APP_ENV::" },
+            { "name": "LOGGING_LEVEL",             "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:LOGGING_LEVEL::" },
+            { "name": "GOOGLE_CLIENT_SECRET_JSON", "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/google-client-secret-json-Il4lQN" },
+            { "name": "MIXPANEL_TOKEN_STAGING", "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:MIXPANEL_TOKEN_STAGING::" },
+            { "name": "GOOGLE_API_KEY", "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:GOOGLE_API_KEY::" },
+            { "name": "GOOGLE_SEARCH_ENGINE_ID", "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/staging/all-env-pzTgCY:GOOGLE_SEARCH_ENGINE_ID::" }
+          ],
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "/ecs/backend-beat-service",
+            "awslogs-region": "us-west-2",
+            "awslogs-stream-prefix": "ecs"
+          }
+        }
+      }
+    ]
+  }
+  

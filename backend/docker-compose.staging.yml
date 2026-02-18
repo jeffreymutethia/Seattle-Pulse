@@ -1,0 +1,34 @@
+version: "3.8"
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.staging
+    ports:
+      - "5001:5001"
+    environment:
+      - FLASK_ENV=production
+      - DATABASE_URL=${STAGING_DATABASE_URL}
+      - CELERY_BROKER_URL=${STAGING_REDIS_URL}
+      - CELERY_RESULT_BACKEND=${STAGING_REDIS_URL}
+    entrypoint: ["python", "/entrypoint.py", "web"]
+
+  celery-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.staging
+    environment:
+      - DATABASE_URL=${STAGING_DATABASE_URL}
+      - CELERY_BROKER_URL=${STAGING_REDIS_URL}
+      - CELERY_RESULT_BACKEND=${STAGING_REDIS_URL}
+    entrypoint: ["python", "/entrypoint.py", "worker"]
+
+  celery-beat:
+    build:
+      context: .
+      dockerfile: Dockerfile.staging
+    environment:
+      - DATABASE_URL=${STAGING_DATABASE_URL}
+      - CELERY_BROKER_URL=${STAGING_REDIS_URL}
+      - CELERY_RESULT_BACKEND=${STAGING_REDIS_URL}
+    entrypoint: ["python", "/entrypoint.py", "beat"]

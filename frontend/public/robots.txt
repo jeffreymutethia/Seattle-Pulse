@@ -1,0 +1,9 @@
+# robots.txt for Seattle Pulse
+
+User-agent: *
+Allow: /
+
+# Add a sitemap once available, e.g.:
+Sitemap: https://seattlepulse.net/sitemap.xml
+
+

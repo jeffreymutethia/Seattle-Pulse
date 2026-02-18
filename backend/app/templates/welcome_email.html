@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+
+      body {
+        background-color: #f8f9fa;
+        display: flex;
+        justify-content: center;
+        padding: 0px;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 600px;
+        background: white;
+      }
+
+      .top-links {
+        background-color: #f8f9fa;
+        padding: 8px;
+        text-align: center;
+      }
+
+      .top-links a {
+        color: #64748b;
+        text-decoration: none;
+        font-size: 14px;
+        margin: 0 8px;
+      }
+
+      .content-wrapper {
+        padding: 0 40px;
+      }
+
+      .content {
+        padding: 0;
+      }
+
+      .content-wt {
+        padding: 40px 0;
+      }
+
+      .logo-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 48px;
+      }
+
+      .logo-section img {
+        width: 32px;
+        height: 32px;
+      }
+
+      .logo-section span {
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+
+      h1 {
+        font-size: 24px;
+        margin-bottom: 24px;
+        color: #000;
+      }
+
+      .message {
+        color: #4a5568;
+        line-height: 1.6;
+        margin-bottom: 32px;
+      }
+
+      .cta-btn {
+        background: #000;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 24px;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+        margin-bottom: 32px;
+        display: inline-block;
+        text-decoration: none;
+      }
+
+      .signature {
+        color: #4a5568;
+        line-height: 1.6;
+      }
+
+      .footer {
+        background: #f1f4f9;
+        padding: 32px 10px;
+        width: 100%;
+        margin-top: 48px;
+        text-align: center;
+      }
+
+      .footer-logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        justify-content: center;
+        margin-bottom: 16px;
+      }
+
+      .footer-logo img {
+        width: 32px;
+        height: 32px;
+      }
+
+      .footer-logo span {
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+
+      .company-info {
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.5;
+        margin-bottom: 16px;
+      }
+
+      .social-icons {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+      }
+
+      .social-icons img {
+        width: 24px;
+        height: 24px;
+        opacity: 0.7;
+      }
+
+      .social-links {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+
+      .social-links a {
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="content-wrapper">
+        <div class="content">
+          <div class="content-wt">
+            <div class="logo-section">
+              <img
+              src="https://seattlepulse-logos.s3.us-east-1.amazonaws.com/Seattle+Pulse_Logo/sp_full+color/sp_full+color_dark_background/sp_logo_color_dark_bg_48px_PNG24.png"
+                alt="{{ company_name }} Logo"
+              />
+              <span>{{ company_name }}</span>
+            </div>
+  
+            <h1>Welcome to Seattle Pulse 🎉</h1>
+  
+            <p class="message">
+              Hi {{ first_name }},
+            </p>
+  
+            <p class="message">
+              You're in. Your feed is live — jump in and take a look around.
+            </p>
+  
+            <a href="{{ app_url }}" class="cta-btn">▶️ Open Seattle Pulse</a>
+  
+            <p class="message">
+              We'd love to hear what you think. You can reply to this email anytime — or fill out <a href="{{ survey_url }}">this quick survey</a> if you have a moment.
+            </p>
+  
+            <p class="message">
+              Your feedback helps shape what we build next.
+            </p>
+  
+            <div class="signature">
+              <p>See you inside,</p>
+              <p>— The {{ company_name }} Team</p>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <div class="footer">
+        <div class="footer-logo">
+          <img
+            src="https://seattlepulse-logos.s3.us-east-1.amazonaws.com/Seattle+Pulse_Logo/sp_full+color/sp_full+color_dark_background/sp_logo_color_dark_bg_48px_PNG24.png"
+            alt="{{ company_name }} Logo"
+            width="48"
+            height="48"
+          />
+          <span>{{ company_name }}</span>
+        </div>
+  
+        <div class="social-links">
+          <a
+            href="https://www.instagram.com/seattle.pulse/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              src="https://img.icons8.com/fluency/48/instagram-new.png"
+              alt="Instagram Logo"
+            />
+          </a>
+          <a
+            href="https://www.tiktok.com/@seattle.pulse?lang=en"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              src="https://img.icons8.com/fluency/48/tiktok.png"
+              alt="TikTok Logo"
+            />
+          </a>
+          <a
+            href="https://x.com/seattle_pulse"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              src="https://img.icons8.com/ios-filled/50/twitterx--v1.png"
+              alt="X Logo"
+            />
+          </a>
+        </div>
+  
+        <div class="company-info">
+          <p>Need help? <a href="mailto:support@seattlepulse.net">support@seattlepulse.net</a></p>
+          <p>&copy; {{ footer_year }} {{ company_name }}. All rights reserved.</p>
+        </div>
+      </div>
+    </div>
+  </body>
+  
+</html>
+

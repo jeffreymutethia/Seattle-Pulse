@@ -1,0 +1,18 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci
+    build:
+      commands:
+        - export NEXT_PUBLIC_GIT_SHA=$(git rev-parse --short HEAD)
+        - export NEXT_PUBLIC_RELEASE=$NEXT_PUBLIC_GIT_SHA
+        - npm run build
+  artifacts:
+    baseDirectory: .next
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*

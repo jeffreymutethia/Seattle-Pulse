@@ -1,0 +1,98 @@
+services:
+  # PostgreSQL database service
+  db:
+    image: postgres:13
+    container_name: db
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - "5433:5432"
+
+  # Redis service
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  # Flask backend (web) service
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: web
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=${FLASK_ENV}
+      - DATABASE_URL=postgresql://seattle-pulse_owner:npg_mFrl6syZnfB1@ep-muddy-cloud-a5hv44kx.us-east-2.aws.neon.tech/seattle-pulse?sslmode=require
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - AWS_ACCESS_KEY_ID=test  # For AWS setup (from incoming version)
+      - AWS_SECRET_ACCESS_KEY=test
+      - S3_ENDPOINT_URL=http://localstack:4566
+      - PYTHONPATH=/app
+      - FLASK_APP=/run.py 
+    depends_on:
+      - redis
+      - localstack
+    entrypoint: ["python", "/entrypoint.py", "web"]
+    volumes:
+      - .:/app  # Mount the root folder
+
+  # Celery worker service
+  celery-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: celery-worker
+    environment:
+      - DATABASE_URL=postgresql://seattle-pulse_owner:npg_mFrl6syZnfB1@ep-muddy-cloud-a5hv44kx.us-east-2.aws.neon.tech/seattle-pulse?sslmode=require
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+    entrypoint: ["python", "/entrypoint.py", "worker"]
+    volumes:
+      - .:/app
+
+  # Celery beat service
+  celery-beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: celery-beat
+    environment:
+      - DATABASE_URL=postgresql://seattle-pulse_owner:npg_mFrl6syZnfB1@ep-muddy-cloud-a5hv44kx.us-east-2.aws.neon.tech/seattle-pulse?sslmode=require
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+    entrypoint: ["python", "/entrypoint.py", "beat"]
+    volumes:
+      - .:/app
+
+  # Localstack (AWS services mock)
+  localstack:
+    image: localstack/localstack
+    container_name: localstack
+    environment:
+      - SERVICES=s3
+      - AWS_DEFAULT_REGION=us-east-1
+    ports:
+      - "4566:4566"
+    volumes:
+      - localstack_data:/var/lib/localstack
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+
+volumes:
+  postgres_data:
+  localstack_data:

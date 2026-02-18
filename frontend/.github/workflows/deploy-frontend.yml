@@ -1,0 +1,105 @@
+name: Build & Deploy Frontend (Amplify)
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Next.js app
+        run: npm run build
+        env:
+          NEXT_PUBLIC_GIT_SHA: ${{ github.sha }}
+          NEXT_PUBLIC_RELEASE: ${{ github.sha }}
+
+      - name: Start app & run Cypress tests
+        run: |
+          npm run start &
+          npx wait-on http://localhost:3000
+          npx cypress run
+        env:
+          CI: true
+
+  deploy:
+    needs: build-test
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: us-west-2
+      AMPLIFY_APP_ID: ${{ secrets.AMPLIFY_APP_ID }}
+    steps:
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubOIDCDeployRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Trigger Amplify build and wait for completion
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          BRANCH="${GITHUB_REF##*/}"
+          echo "Starting Amplify build for branch: $BRANCH"
+
+          # ----- start the job -----
+          echo "Calling aws amplify start-job..."
+          JOB_ID=$(aws amplify start-job \
+            --app-id "$AMPLIFY_APP_ID" \
+            --branch-name "$BRANCH" \
+            --job-type RELEASE \
+            --query "jobSummary.jobId" \
+            --output text)
+
+          if [ -z "$JOB_ID" ] || [ "$JOB_ID" = "None" ]; then
+            echo "❌ Could not obtain jobId from start-job response"
+            exit 1
+          fi
+
+          echo "Started Amplify job with id: $JOB_ID"
+
+          # ----- poll for status -----
+          SLEEP_SECONDS=20        # how often to poll
+          TIMEOUT_SECONDS=1800    # max 30 minutes
+          ELAPSED=0
+
+          while true; do
+            STATUS=$(aws amplify get-job \
+              --app-id "$AMPLIFY_APP_ID" \
+              --branch-name "$BRANCH" \
+              --job-id "$JOB_ID" \
+              --query "job.summary.status" \
+              --output text)
+
+            echo "Current Amplify job status: $STATUS"
+
+            if [ "$STATUS" = "SUCCEED" ]; then
+              echo "✅ Amplify deployment succeeded."
+              exit 0
+            elif [ "$STATUS" = "FAILED" ] || [ "$STATUS" = "CANCELLED" ] || [ "$STATUS" = "ERROR" ]; then
+              echo "❌ Amplify deployment finished with status: $STATUS"
+              exit 1
+            fi
+
+            if [ "$ELAPSED" -ge "$TIMEOUT_SECONDS" ]; then
+              echo "❌ Timed out after ${TIMEOUT_SECONDS}s waiting for Amplify job to finish."
+              exit 1
+            fi
+
+            echo "Waiting ${SLEEP_SECONDS}s before checking again..."
+            sleep "$SLEEP_SECONDS"
+            ELAPSED=$((ELAPSED + SLEEP_SECONDS))
+          done

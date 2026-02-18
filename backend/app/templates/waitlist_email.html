@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+      body {
+        background-color: #f8f9fa;
+        display: flex;
+        justify-content: center;
+        padding: 0px;
+      }
+      .container {
+        width: 100%;
+        max-width: 600px;
+        background: white;
+      }
+      .top-links {
+        background-color: #f8f9fa;
+        padding: 8px;
+        text-align: center;
+      }
+      .top-links a {
+        color: #64748b;
+        text-decoration: none;
+        font-size: 14px;
+        margin: 0 8px;
+      }
+      .content-wrapper {
+        padding: 0 40px;
+      }
+      .content {
+        padding: 0;
+      }
+      .content-wt {
+        padding: 40px 0;
+      }
+      .logo-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 48px;
+      }
+      .logo-section img {
+        width: 32px;
+        height: 32px;
+      }
+      .logo-section span {
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+      h1 {
+        font-size: 24px;
+        margin-bottom: 24px;
+        color: #000;
+      }
+      .message {
+        color: #4a5568;
+        line-height: 1.6;
+        margin-bottom: 32px;
+      }
+      .reset-btn {
+        background: #000;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 24px;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+        margin-bottom: 32px;
+        display: inline-block;
+        text-decoration: none;
+      }
+      .warning {
+        color: #4a5568;
+        margin-bottom: 32px;
+      }
+      .signature {
+        color: #4a5568;
+        line-height: 1.6;
+      }
+      .footer {
+        background: #f1f4f9;
+        padding: 32px 10px;
+        width: 100%;
+        margin-top: 48px;
+      }
+      .footer-logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      .footer-logo img {
+        width: 32px;
+        height: 32px;
+      }
+      .footer-logo span {
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+      .company-info {
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.5;
+        margin-bottom: 16px;
+      }
+      .social-icons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 16px;
+      }
+      .social-icons img {
+        width: 24px;
+        height: 24px;
+        opacity: 0.7;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+     
+      <div class="content-wrapper">
+        <div class="content">
+          <div class="content-wt">
+            <div class="logo-section">
+              <img src="https://s3-alpha-sig.figma.com/img/26a6/48ae/27a9b6ce97d2714438d6f268eb06b092" alt="{company_name} Logo" />
+              <span>{company_name}</span>
+            </div>
+            <h1>You're on the waitlist!</h1>
+            <p class="message">
+              Hi {first_name},<br /><br />
+              Thank you for signing up on {signup_ts}.<br /><br />
+              We're thrilled to have you with us. Keep an eye on your inbox — exciting things are coming your way!
+            </p>
+            <a href="#" class="reset-btn">Visit Our Website</a>
+            <p class="warning">No action needed. You're all set!</p>
+            <div class="signature">
+              <p>Thank you,</p>
+              <p>The {company_name} Team</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="footer-logo">
+          <img src="https://s3-alpha-sig.figma.com/img/26a6/48ae/27a9b6ce97d2714438d6f268eb06b092" alt="{company_name} Logo" />
+          <span>{company_name}</span>
+        </div>
+        <div class="company-info">
+          <p>&copy; {company_name}, Inc.</p>
+          <p>{company_loc}<br />{company_ctry}</p>
+        </div>
+        <div class="social-icons">
+          <a href="#"><img src="https://img.icons8.com/fluency/48/instagram-new.png" alt="Instagram" /></a>
+          <a href="#"><img src="https://img.icons8.com/fluency/48/facebook-new.png" alt="Facebook" /></a>
+          <a href="#"><img src="https://img.icons8.com/ios-filled/50/twitterx--v1.png" alt="Twitter" /></a>
+          <a href="#"><img src="https://img.icons8.com/color/48/youtube-play.png" alt="YouTube" /></a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

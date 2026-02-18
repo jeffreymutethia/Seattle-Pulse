@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+      }
+
+      body {
+        background-color: #f8f9fa;
+        display: flex;
+        justify-content: center;
+        padding: 0;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 600px;
+        background: #fff;
+      }
+
+      .top-links {
+        background-color: #f8f9fa;
+        padding: 8px;
+        text-align: center;
+      }
+
+      .top-links a {
+        color: #64748b;
+        text-decoration: none;
+        font-size: 14px;
+        margin: 0 8px;
+      }
+
+      .content-wrapper {
+        padding: 0 40px;
+      }
+
+      .content-wt {
+        padding: 40px 0;
+      }
+
+      .logo-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 48px;
+      }
+
+      .logo-section img {
+        width: 32px;
+        height: 32px;
+      }
+
+      .logo-section span {
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+
+      h1 {
+        font-size: 24px;
+        margin-bottom: 24px;
+        color: #000;
+      }
+
+      .message {
+        color: #4a5568;
+        line-height: 1.6;
+        margin-bottom: 32px;
+      }
+
+      .footer {
+        background: #f1f4f9;
+        padding: 32px 10px;
+        width: 100%;
+        margin-top: 48px;
+        text-align: center;
+      }
+
+      .footer-logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .footer-logo img {
+        width: 32px;
+        height: 32px;
+      }
+
+      .footer-logo span {
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+
+      .social-links {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        margin: 0 auto 16px;
+        width: 100%;
+      }
+
+      .social-links img {
+        width: 24px;
+        height: 24px;
+      }
+
+      .company-info {
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+     
+
+      <div class="content-wrapper">
+        <div class="content-wt">
+          <div class="logo-section">
+            <img
+              src="https://seattlepulse-logos.s3.us-east-1.amazonaws.com/Seattle+Pulse_Logo/sp_full+color/sp_full+color_dark_background/sp_logo_color_dark_bg_180px_PNG24.png"
+              alt="{{ company_name }} Logo"
+              width="180"
+              height="180"
+            />
+            <span>{{ company_name }}</span>
+          </div>
+
+       
+
+          <p class="message">
+          
+            You're officially on the wait-list and we'll keep you in the loop as we roll out.
+          </p>
+
+          <div class="message">
+            <p>What happens next?</p>
+            <ul style="margin-left: 20px; color: #4a5568;">
+              <li>We'll email you when Seattle Pulse launches in your neighbourhood.</li>
+              <li>You'll get early access to member-only events and insider news.</li>
+            </ul>
+            <p style="margin-top: 20px;">That's it—no further action needed. We're excited to have you with us!</p>
+          </div>
+
+          <div class="signature">
+            <p >See you soon,</p>
+            <p>The Seattle Pulse Team</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div class="footer-logo">
+          <img
+            src="https://seattlepulse-logos.s3.us-east-1.amazonaws.com/Seattle+Pulse_Logo/sp_full+color/sp_full+color_dark_background/sp_logo_color_dark_bg_48px_PNG24.png"
+            alt="{{ company_name }} Logo"
+            width="48"
+            height="48"
+          />
+          <span>{{ company_name }}</span>
+        </div>
+
+        <div class="social-links">
+          <a href="https://www.instagram.com/seattle.pulse/" target="_blank" rel="noopener noreferrer">
+            <img src="https://img.icons8.com/fluency/48/instagram-new.png" alt="Instagram Logo" />
+          </a>
+          <a href="https://www.tiktok.com/@seattle.pulse?lang=en" target="_blank" rel="noopener noreferrer">
+            <img src="https://img.icons8.com/fluency/48/tiktok.png" alt="TikTok Logo" />
+          </a>
+          <a href="https://x.com/seattle_pulse" target="_blank" rel="noopener noreferrer">
+            <img src="https://img.icons8.com/ios-filled/50/twitterx--v1.png" alt="X Logo" />
+          </a>
+        </div>
+
+        <div class="company-info">
+          <p>&copy; {{ footer_year }} {{ company_name }}. All rights reserved.</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+

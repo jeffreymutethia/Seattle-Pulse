@@ -1,0 +1,113 @@
+name: Deploy to Production on ECS
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+  
+jobs:
+  deploy-web-production:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Set up Python for Production
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Cache pip dependencies (Production)
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install Python dependencies (Production)
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Configure AWS credentials via OIDC (Production)
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::962183815893:role/GitHubOIDCDeployRole
+          aws-region: us-west-2
+        
+      - name: Log in to Amazon ECR (Production)
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Set up Docker Buildx (Production)
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers (Production)
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Write Google client secret file (Production)
+        run: |
+          cat > client_secret.json <<'EOF'
+          ${{ secrets.GOOGLE_CLIENT_SECRET_JSON }}
+          EOF
+
+      - name: Build and Push Docker image (Production)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY_PROD }}:latest
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
+
+      - name: Move new Docker cache (Production)
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+      - name: Generate Production Web task definition file
+        run: |
+          echo '${{ secrets.ECS_TASK_DEF_TEMPLATE_PROD }}' > ecs-task-def-web.json
+
+      - name: Render ECS task definition for Production Web
+        id: render-task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ecs-task-def-web.json
+          container-name: backend-api
+          image: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY_PROD }}:latest
+
+      - name: Deploy Production Web to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          cluster:         ${{ secrets.ECS_CLUSTER_NAME_PROD }}
+          service:         ${{ secrets.ECS_SERVICE_NAME_PROD }}
+          task-definition: ${{ steps.render-task-def.outputs.task-definition }}
+
+      # ─── Build and Push Lambda Docker image (Production)
+      - name: Build Lambda Docker image (Production)
+        run: |
+          docker build -f lambda-news-fetcher/Dockerfile -t ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY_PROD }}:lambda-news-fetcher .
+          docker push ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY_PROD }}:lambda-news-fetcher
+          
+      # ─── Update the Lambda function to use the newly‐pushed image (Production)
+      - name: Update Lambda function code (image, Production)
+        run: |
+          aws lambda update-function-code \
+            --function-name seattlepulse-news-fetcher-production \
+            --image-uri ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY_PROD }}:lambda-news-fetcher

@@ -1,0 +1,45 @@
+{
+  "next": "http://localhost:3000/api/v1/content/?page=2",
+  "results": [
+    {
+      "id": 1,
+      "type": "user_content",
+      "user": {
+        "id": 1,
+        "username": "testuser",
+        "profile_picture_url": "https://example.com/avatar.jpg",
+        "bio": "This is a test user"
+      },
+      "title": "Test Post",
+      "body": "This is a test post content",
+      "thumbnail": "https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_1280.jpg",
+      "location": "Seattle, WA",
+      "time_since_post": "30 mins ago",
+      "comments_count": 2,
+      "total_reactions": 5,
+      "top_reactions": ["like", "love", "wow"],
+      "user_reaction": null,
+      "has_user_reposted": false
+    },
+    {
+      "id": 2,
+      "type": "user_content",
+      "user": {
+        "id": 2,
+        "username": "anotheruser",
+        "profile_picture_url": "https://example.com/another-avatar.jpg",
+        "bio": "Another test user"
+      },
+      "title": "Another Test Post",
+      "body": "This is another test post content",
+      "thumbnail": "https://cdn.pixabay.com/photo/2016/11/23/13/48/beach-1852945_1280.jpg",
+      "location": "Seattle, WA",
+      "time_since_post": "1 hour ago",
+      "comments_count": 5,
+      "total_reactions": 10,
+      "top_reactions": ["like", "love", "haha"],
+      "user_reaction": null,
+      "has_user_reposted": false
+    }
+  ]
+} 

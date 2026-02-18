@@ -1,0 +1,175 @@
+name: Deploy to Staging on ECS
+
+on:
+  push:
+    branches:
+      - develop
+
+permissions:
+  id-token: write
+  contents: read     
+
+jobs:
+  deploy-web-staging:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Set up Python for Staging
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Cache pip dependencies (Staging)
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install Python dependencies (Staging)
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Configure AWS credentials (Staging)
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::962183815893:role/GitHubOIDCDeployRole
+          aws-region: us-west-2        
+
+      - name: Log in to Amazon ECR (Staging)
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Set up Docker Buildx (Staging)
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers (Staging)
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Build and Push Docker image (Staging)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:latest
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
+
+      - name: Move new Docker cache (Staging)
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+      # Build and push the Lambda image (Staging)
+      - name: Build and Push Lambda image (Staging)
+        run: |
+          docker build \
+            --progress=plain \
+            -f lambda-news-fetcher/Dockerfile \
+            -t ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:lambda-news-fetcher \
+            .
+          docker push ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:lambda-news-fetcher
+          
+      # ─── Update the Lambda function to use the newly‐pushed image (Staging)
+      - name: Update Lambda function code (image, Staging)
+        run: |
+          aws lambda update-function-code \
+            --function-name ${{ secrets.LAMBDA_NEWS_FETCHER_FUNCTION }} \
+            --image-uri ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:lambda-news-fetcher
+
+      - name: Generate Staging Web task definition file
+        run: |
+          echo '${{ secrets.ECS_TASK_DEF_TEMPLATE }}' > ecs-task-def-web.json
+
+      - name: Render ECS task definition for Staging Web
+        id: render-task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ecs-task-def-web.json
+          container-name: backend-app
+          image: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:latest
+
+      - name: Deploy Staging Web to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          cluster:         ${{ secrets.ECS_CLUSTER_NAME }}
+          service:         ${{ secrets.ECS_SERVICE_NAME }}
+          task-definition: ${{ steps.render-task-def.outputs.task-definition }}
+
+  deploy-worker-staging:
+    needs: deploy-web-staging
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::962183815893:role/GitHubOIDCDeployRole
+          aws-region: us-west-2
+
+      - name: Log in to Amazon ECR (Staging)
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Generate Staging Worker task definition file
+        run: |
+          echo '${{ secrets.ECS_TASK_DEF_TEMPLATE_WORKER }}' > ecs-task-def-worker.json
+
+      - name: Render ECS task definition for Staging Worker
+        id: render-task-def-worker
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ecs-task-def-worker.json
+          container-name:  backend-app
+          image:           ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:latest
+
+      - name: Deploy Staging Worker to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          cluster:         ${{ secrets.ECS_CLUSTER_NAME }}
+          service:         ${{ secrets.ECS_WORKER_SERVICE_NAME }}
+          task-definition: ${{ steps.render-task-def-worker.outputs.task-definition }}
+
+  deploy-beat-staging:
+    needs: deploy-worker-staging
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::962183815893:role/GitHubOIDCDeployRole
+          aws-region: us-west-2
+
+      - name: Log in to Amazon ECR (Staging)
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Generate Staging Beat task definition file
+        run: |
+          echo '${{ secrets.ECS_TASK_DEF_TEMPLATE_BEAT }}' > ecs-task-def-beat.json
+
+      - name: Render ECS task definition for Staging Beat
+        id: render-task-def-beat
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ecs-task-def-beat.json
+          container-name:  backend-app
+          image:           ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:latest
+
+      - name: Deploy Staging Beat to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          cluster:         ${{ secrets.ECS_CLUSTER_NAME }}
+          service:         ${{ secrets.ECS_BEAT_SERVICE_NAME }}
+          task-definition: ${{ steps.render-task-def-beat.outputs.task-definition }}

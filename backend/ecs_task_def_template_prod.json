@@ -1,0 +1,136 @@
+{
+    "family": "backend-prod-task",
+    "networkMode": "awsvpc",
+    "requiresCompatibilities": ["FARGATE"],
+    "cpu": "1024",
+    "memory": "3072",
+    "executionRoleArn": "arn:aws:iam::962183815893:role/ecsTaskExecutionRole",
+    "taskRoleArn": "arn:aws:iam::962183815893:role/ecsTaskExecutionRole",
+    "containerDefinitions": [
+      {
+        "name": "backend-api",
+        "image": "REPLACE_ME_IMAGE_URI",
+        "cpu": 0,
+        "portMappings": [
+          {
+            "containerPort": 5000,
+            "hostPort": 5000,
+            "protocol": "tcp",
+            "name": "backend-api-5000-tcp",
+            "appProtocol": "http"
+          }
+        ],
+        "essential": true,
+        "command": ["web"],
+        "environment": [],
+        "secrets": [
+          {
+            "name": "AWS_ACCESS_KEY_ID",
+            "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/prod/all-env-dyDx04:AWS_ACCESS_KEY_ID::"
+          },
+          {
+            "name": "AWS_REGION",
+            "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/prod/all-env-dyDx04:AWS_REGION::"
+          },
+          {
+            "name": "AWS_SECRET_ACCESS_KEY",
+            "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/prod/all-env-dyDx04:AWS_SECRET_ACCESS_KEY::"
+          },
+          {
+            "name": "CELERY_BROKER_URL",
+            "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/prod/all-env-dyDx04:CELERY_BROKER_URL::"
+          },
+          {
+            "name": "CELERY_RESULT_BACKEND",
+            "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/prod/all-env-dyDx04:CELERY_RESULT_BACKEND::"
+          },
+          {
+            "name": "DATABASE_URL",
+            "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/prod/all-env-dyDx04:DATABASE_URL::"
+          },
+          {
+            "name": "FLASK_APP",
+            "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/prod/all-env-dyDx04:FLASK_APP::"
+          },
+          {
+            "name": "FLASK_ENV",
+            "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/prod/all-env-dyDx04:FLASK_ENV::"
+          },
+          {
+            "name": "FRONTEND_URL",
+            "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/prod/all-env-dyDx04:FRONTEND_URL::"
+          },
+          {
+            "name": "MAIL_PASSWORD",
+            "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/prod/all-env-dyDx04:MAIL_PASSWORD::"
+          },
+          {
+            "name": "MAIL_USERNAME",
+            "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/prod/all-env-dyDx04:MAIL_USERNAME::"
+          },
+          {
+            "name": "PERFORM_STARTUP_FETCH",
+            "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/prod/all-env-dyDx04:PERFORM_STARTUP_FETCH::"
+          },
+          {
+            "name": "USE_LOCALSTACK",
+            "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/prod/all-env-dyDx04:USE_LOCALSTACK::"
+          },
+          {
+            "name": "GOOGLE_CLIENT_ID",
+            "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/prod/all-env-dyDx04:GOOGLE_CLIENT_ID::"
+          },
+          {
+            "name": "GOOGLE_CLIENT_SECRET",
+            "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/prod/all-env-dyDx04:GOOGLE_CLIENT_SECRET::"
+          },
+          {
+            "name": "GOOGLE_AUTH_REDIRECT_URI",
+            "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/prod/all-env-dyDx04:GOOGLE_AUTH_REDIRECT_URI::"
+          },
+          {
+            "name": "APP_ENV",
+            "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/prod/all-env-dyDx04:APP_ENV::"
+          },
+          {
+            "name": "SECRET_KEY",
+            "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/prod/all-env-dyDx04:SECRET_KEY::"
+          },
+          {
+            "name": "MIXPANEL_TOKEN_PROD",
+            "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/prod/all-env-dyDx04:MIXPANEL_TOKEN_PROD::"
+          },
+          {
+            "name": "TWILIO_ACCOUNT_SID",
+            "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/prod/all-env-dyDx04:TWILIO_ACCOUNT_SID::"
+          },
+          {
+            "name": "TWILIO_AUTH_TOKEN",
+            "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/prod/all-env-dyDx04:TWILIO_AUTH_TOKEN::"
+          },
+          {
+            "name": "TWILIO_VERIFY_SERVICE_SID",
+            "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/prod/all-env-dyDx04:TWILIO_VERIFY_SERVICE_SID::"
+          },
+          {
+            "name": "GOOGLE_API_KEY",
+            "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/prod/all-env-dyDx04:GOOGLE_API_KEY::"
+          },
+          {
+            "name": "GOOGLE_SEARCH_ENGINE_ID",
+            "valueFrom": "arn:aws:secretsmanager:us-west-2:962183815893:secret:/seattlepulse/prod/all-env-dyDx04:GOOGLE_SEARCH_ENGINE_ID::"
+          }         
+        ],
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "/ecs/backend-prod-task",
+            "awslogs-create-group": "true",
+            "awslogs-region": "us-west-2",
+            "awslogs-stream-prefix": "ecs"
+          }
+        }
+      }
+    ]
+  }
+  
