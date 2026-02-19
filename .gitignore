@@ -1,0 +1,98 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files and secrets
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+*.pem
+*.p12
+*.pfx
+*.key
+*.crt
+*.cer
+id_rsa
+id_ed25519
+client_secret.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.venv/
+venv/
+env/
+ENV/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# Node / JS
+node_modules/
+.pnpm-store/
+.npm/
+.yarn/
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# Build outputs and caches
+.next/
+out/
+dist/
+build/
+coverage/
+.cache/
+.parcel-cache/
+.turbo/
+
+# Test artifacts
+.cypress-cache/
+playwright-report/
+test-results/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+instance/*.db
+instance/*.sqlite
+instance/*.sqlite3
+
+# Docker overrides/local volumes
+compose.override.yml
+docker-compose.override.yml
+
+# Editor
+.vscode/
+
+# Local env
+.env
+**/.env
+
+# Local DB / runtime
+backend/instance/
+**/*.sqlite
+**/*.db
+
+design/brand/**/*.ai
+design/brand/**/*.pdf
+design/
+design/

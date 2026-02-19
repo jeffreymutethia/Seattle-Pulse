@@ -77,16 +77,21 @@ export default async function RootLayout({
 }) {
   const headersList = headers();
   const hasSession = (await headersList).get("x-has-session") === "true";
+  const isProduction = process.env.NODE_ENV === "production";
 
   return (
     <html lang="en">
       <head>
         {/* Hint font loading for better mobile FCP */}
         <link rel="preload" as="font" href="/fonts/Poppins-Regular.ttf" type="font/ttf" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://seattlepulse.net" />
-        <link rel="dns-prefetch" href="https://seattlepulse.net" />
-        <link rel="preconnect" href="https://api.staging.seattlepulse.net" />
-        <link rel="dns-prefetch" href="https://api.staging.seattlepulse.net" />
+        {isProduction ? (
+          <>
+            <link rel="preconnect" href="https://seattlepulse.net" />
+            <link rel="dns-prefetch" href="https://seattlepulse.net" />
+            <link rel="preconnect" href="https://api.seattlepulse.net" />
+            <link rel="dns-prefetch" href="https://api.seattlepulse.net" />
+          </>
+        ) : null}
       </head>
       <body className={poppins.className}>
         <AuthProvider>

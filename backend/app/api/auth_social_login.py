@@ -47,16 +47,19 @@ else:
 def log_client_secret_file():
     current_app.logger.info(f"Using client secrets file: {CLIENT_SECRETS_FILE}")
 
-# Initialize OAuth 2.0 Flow
-flow = Flow.from_client_secrets_file(
-    client_secrets_file=CLIENT_SECRETS_FILE,
-    scopes=[
-        "openid",
-        "https://www.googleapis.com/auth/userinfo.profile",
-        "https://www.googleapis.com/auth/userinfo.email",
-    ],
-    redirect_uri=GOOGLE_REDIRECT_URI,
-)
+def get_flow():
+    """Create OAuth flow lazily so missing local secrets don't crash app startup."""
+    if not os.path.exists(CLIENT_SECRETS_FILE):
+        return None
+    return Flow.from_client_secrets_file(
+        client_secrets_file=CLIENT_SECRETS_FILE,
+        scopes=[
+            "openid",
+            "https://www.googleapis.com/auth/userinfo.profile",
+            "https://www.googleapis.com/auth/userinfo.email",
+        ],
+        redirect_uri=GOOGLE_REDIRECT_URI,
+    )
 
 def login_required(func):
     """Decorator to check if the user is logged in"""
@@ -71,6 +74,10 @@ def login_required(func):
 @auth_social_login_blueprint.route("/login", methods=["GET"])
 def login():
     """Redirect user to Google for authentication or return URL for mobile."""
+    flow = get_flow()
+    if flow is None:
+        return jsonify({"status": "error", "message": "Google OAuth is not configured."}), 503
+
     is_mobile = request.args.get("isMobile", "false").lower() == "true"
 
     authorization_url, state = flow.authorization_url()
@@ -106,6 +113,9 @@ def generate_unique_username(first_name, last_name):
 @auth_social_login_blueprint.route("/callback", methods=["GET"])
 def callback():
     """Handle Google OAuth callback and authenticate user (Web & Mobile)."""
+    flow = get_flow()
+    if flow is None:
+        return jsonify({"status": "error", "message": "Google OAuth is not configured."}), 503
 
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"  # Allow HTTP in local dev
 

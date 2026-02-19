@@ -29,12 +29,12 @@ services:
       - "5000:5000"
     environment:
       - FLASK_ENV=${FLASK_ENV}
-      - DATABASE_URL=postgresql://seattle-pulse_owner:npg_mFrl6syZnfB1@ep-muddy-cloud-a5hv44kx.us-east-2.aws.neon.tech/seattle-pulse?sslmode=require
+      - DATABASE_URL=${DATABASE_URL}
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - AWS_ACCESS_KEY_ID=test  # For AWS setup (from incoming version)
-      - AWS_SECRET_ACCESS_KEY=test
-      - S3_ENDPOINT_URL=http://localstack:4566
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - S3_ENDPOINT_URL=${S3_ENDPOINT_URL}
       - PYTHONPATH=/app
       - FLASK_APP=/run.py 
     depends_on:
@@ -51,7 +51,7 @@ services:
       dockerfile: Dockerfile
     container_name: celery-worker
     environment:
-      - DATABASE_URL=postgresql://seattle-pulse_owner:npg_mFrl6syZnfB1@ep-muddy-cloud-a5hv44kx.us-east-2.aws.neon.tech/seattle-pulse?sslmode=require
+      - DATABASE_URL=${DATABASE_URL}
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
@@ -67,7 +67,7 @@ services:
       dockerfile: Dockerfile
     container_name: celery-beat
     environment:
-      - DATABASE_URL=postgresql://seattle-pulse_owner:npg_mFrl6syZnfB1@ep-muddy-cloud-a5hv44kx.us-east-2.aws.neon.tech/seattle-pulse?sslmode=require
+      - DATABASE_URL=${DATABASE_URL}
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:

@@ -14,6 +14,7 @@ import { useForm } from "react-hook-form";
 import AsyncSelect from "react-select/async";
 import { useHomeLocationSearch } from "@/app/hooks/use-location-search";
 import { trackEvent } from "@/lib/mixpanel";
+import { FULL_LOGO_SRC } from "@/lib/brand-assets";
 
 const signupSchema = z
   .object({
@@ -218,7 +219,7 @@ export default function Signup() {
       <div className="w-full max-w-lg p-4">
         <div className="flex justify-center pb-8">
           <img
-            src="https://seattlepulse-logos.s3.us-east-1.amazonaws.com/Seattle+Pulse_Logo/sp_full+color/sp_full+color_light+background/sp_logo_color_light_bg_1024px_PNG24.png"
+            src={FULL_LOGO_SRC}
             className="w-36 h-36"
             alt="Logo"
           />
@@ -588,5 +589,4 @@ export default function Signup() {
     </div>
   );
 }
-
 

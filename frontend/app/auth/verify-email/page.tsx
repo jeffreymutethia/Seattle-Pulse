@@ -14,6 +14,7 @@ import {
 } from "@/app/hooks/use-auth";
 import { useAuth } from "@/app/context/auth-context";
 import { trackEvent, identifyUser } from "@/lib/mixpanel";
+import { FULL_LOGO_SRC } from "@/lib/brand-assets";
 
 export default function VerifyEmail() {
   const searchParams = useSearchParams();
@@ -198,7 +199,7 @@ export default function VerifyEmail() {
 
         <div className="w-full p-8 flex justify-center">
           <Image
-                        src="https://seattlepulse-logos.s3.us-east-1.amazonaws.com/Seattle+Pulse_Logo/sp_full+color/sp_full+color_light+background/sp_logo_color_light_bg_1024px_PNG24.png"
+                        src={FULL_LOGO_SRC}
             
             className="w-36 h-36 pb-8"
             width={144}

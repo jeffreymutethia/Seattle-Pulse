@@ -6,9 +6,6 @@ class BaseConfig:
     SECRET_KEY = os.getenv("SECRET_KEY", os.urandom(16).hex())
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
 
-    if not SQLALCHEMY_DATABASE_URI:
-        raise ValueError("No DATABASE_URL set for SQLAlchemy database.")
-
     UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uploads")
     ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "mp4", "mov", "avi"}
 

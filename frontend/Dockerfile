@@ -8,4 +8,4 @@ RUN npm install
 COPY . . 
 
 EXPOSE 3000
-CMD ["npm", "run", "dev"]  # or "build", "start", etc., depending on your workflow
+CMD ["npm", "run", "dev", "--", "-H", "0.0.0.0", "-p", "3000"]

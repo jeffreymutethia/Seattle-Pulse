@@ -21,6 +21,7 @@ import { useHomeLocationSearch } from "@/app/hooks/use-location-search";
 import { AuthPopup } from "./auth/auth-popup";
 import Image from "next/image";
 import { apiClient } from "@/app/api/api-client";
+import { FULL_LOGO_SRC } from "@/lib/brand-assets";
 
 // Dynamic import outside component to prevent re-creation
 const SearchWithResults = dynamic(() => import("./search-component"), {
@@ -269,7 +270,7 @@ const NavBar = ({
         {/* Title and Buttons Row */}
         <div className="flex items-center justify-between mb-4">
           <Image 
-          src="https://seattlepulse-logos.s3.us-east-1.amazonaws.com/Seattle+Pulse_Logo/sp_full+color/sp_full+color_light+background/sp_logo_color_light_bg_1024px_PNG24.png" alt="Seattle Pulse" width={56} height={56} className="object-contain"
+          src={FULL_LOGO_SRC} alt="Seattle Pulse" width={56} height={56} className="object-contain"
           />
           <div className="flex gap-4">
             {/* Message Icon - Always visible */}

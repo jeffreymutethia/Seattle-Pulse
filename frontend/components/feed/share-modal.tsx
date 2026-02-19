@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import {  Link2, MapPin, Check, Users } from "lucide-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -53,6 +53,7 @@ export function ShareModal({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-2xl p-0 gap-0 bg-white rounded-3xl border-none overflow-hidden">
+        <DialogTitle className="sr-only">Share post</DialogTitle>
         {/* Header */}
         <div className="relative py-4">
           <p className="text-center font-semibold text-xl text-black">Share</p>

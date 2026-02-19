@@ -2,24 +2,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { API_BASE_URL } from "@/lib/config";
 
-// Helper function to ensure HTTPS is used
-const ensureHttps = (url: string): string => {
-  // If the URL starts with http://, replace it with https://
-  if (url.startsWith('http://')) {
-    return url.replace('http://', 'https://');
-  }
-  return url;
-};
-
 export const apiClient = {
   async request<T>(
     endpoint: string,
     method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE" = "GET",
     data?: any
   ): Promise<T> {
-    // Ensure HTTPS is used
-    const secureBaseUrl = ensureHttps(API_BASE_URL);
-    const url = `${secureBaseUrl}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+    const url = `${API_BASE_URL}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
     
     const options: RequestInit = {
       method,

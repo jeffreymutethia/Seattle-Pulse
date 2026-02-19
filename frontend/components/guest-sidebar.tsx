@@ -4,13 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { trackEvent } from "@/lib/mixpanel";
+import { FULL_LOGO_SRC } from "@/lib/brand-assets";
 
 export function GuestSidebar() {
   return (
     <div className="hidden md:flex h-full w-[250px] flex-col border-r bg-white">
       <div className="flex justify-center h-16 items-center p-16">
       <Image
-            src="https://seattlepulse-logos.s3.us-east-1.amazonaws.com/Seattle+Pulse_Logo/sp_full+color/sp_full+color_light+background/sp_logo_color_light_bg_1024px_PNG24.png"
+            src={FULL_LOGO_SRC}
             alt="Seattle Pulse Logo"
             width={195}
             height={195}

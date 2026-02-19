@@ -1,16 +1,28 @@
-# seattle_pulse_mobile
+# Seattle Pulse Mobile (Optional)
 
-A new Flutter project.
+This directory contains the Seattle Pulse Flutter app code. Mobile is optional and not required for the main web/API demo.
 
-## Getting Started
+## Prerequisites
 
-This project is a starting point for a Flutter application.
+Install Flutter locally (do not vendor Flutter SDK into this repository):
+- https://docs.flutter.dev/get-started/install
 
-A few resources to get you started if this is your first Flutter project:
+Verify your local setup:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+```bash
+flutter doctor
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Local Run
+
+From this `mobile/` directory:
+
+```bash
+flutter pub get
+flutter run
+```
+
+## Notes
+
+- Keep app code in this folder (`lib/`, `android/`, `ios/`, etc.).
+- Do not commit a local Flutter SDK checkout such as `mobile/flutter/`.

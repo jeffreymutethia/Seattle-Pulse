@@ -15,6 +15,7 @@ import type { LoginRequest } from "@/app/types/auth";
 import { z } from "zod";
 import { API_BASE_URL } from "@/lib/config";
 import { trackEvent } from "@/lib/mixpanel";
+import { FULL_LOGO_SRC } from "@/lib/brand-assets";
 import Image from "next/image";
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -147,7 +148,7 @@ export default function Login() {
       <div className="w-full max-w-lg p-4">
         <div className="flex justify-center pb-8">
           <Image
-            src="https://seattlepulse-logos.s3.us-east-1.amazonaws.com/Seattle+Pulse_Logo/sp_full+color/sp_full+color_light+background/sp_logo_color_light_bg_1024px_PNG24.png"
+            src={FULL_LOGO_SRC}
             className="w-36 h-36"
             width={144}
             height={144}

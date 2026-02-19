@@ -5,7 +5,7 @@ import { useEffect, useState } from "react"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRouter } from "next/navigation"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -214,6 +214,7 @@ export default function CommentModal({
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="max-w-lg bg-white flex items-center justify-center">
+          <DialogTitle className="sr-only">Comments</DialogTitle>
           {isLoading && <p>Loading content details...</p>}
           {error && <p className="text-red-600">Error: {error}</p>}
           {!contentDetails && <p>No content details available.</p>}
@@ -243,6 +244,9 @@ export default function CommentModal({
 
           <div className="fixed inset-0 flex items-center justify-center z-[9999]">
             <DialogContent className="w-[1276px] max-w-none h-[827px] p-0 bg-transparent border-none rounded-[24px] z-[9999]">
+              <DialogTitle className="sr-only">
+                {contentDetails.title ? `Comments for ${contentDetails.title}` : "Comments"}
+              </DialogTitle>
               <Card className="w-full h-full bg-transparent shadow-none rounded-[24px] border-0 overflow-hidden">
                 <div className="flex flex-row h-full">
                   <div className="w-1/2 relative h-full bg-gray-100">

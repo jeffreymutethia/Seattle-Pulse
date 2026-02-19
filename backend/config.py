@@ -12,18 +12,29 @@ def _clean(var, fallback):
 
 
 SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
-if not SQLALCHEMY_DATABASE_URI:
-    raise ValueError("No DATABASE_URL set for SQLAlchemy database.")
 
-# SQLAlchemy Engine with Connection Pooling
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URI,
-    pool_size=10,  # Maintain up to 10 open connections
-    max_overflow=5,  # Allow 5 temporary extra connections if needed
-    pool_timeout=30,  # Wait 30 seconds for a connection before raising error
-    pool_recycle=1800,  # Refresh connections every 30 minutes
-    pool_pre_ping=True,  # Auto-reconnect if Neon DB closes the connection
-)
+
+def get_database_url() -> str:
+    """Resolve database URL lazily so config imports never crash local tooling."""
+    db_url = os.getenv("DATABASE_URL")
+    if not db_url:
+        raise ValueError(
+            "DATABASE_URL is not set. Configure backend/.env or export DATABASE_URL "
+            "before running database-backed commands."
+        )
+    return db_url
+
+
+def get_engine():
+    """Create SQLAlchemy engine lazily when DB access is actually needed."""
+    return create_engine(
+        get_database_url(),
+        pool_size=10,  # Maintain up to 10 open connections
+        max_overflow=5,  # Allow 5 temporary extra connections if needed
+        pool_timeout=30,  # Wait 30 seconds for a connection before raising error
+        pool_recycle=1800,  # Refresh connections every 30 minutes
+        pool_pre_ping=True,  # Auto-reconnect if Neon DB closes the connection
+    )
 # Flask app configuration (new addition)
 FLASK_APP = os.getenv("FLASK_APP", "run:app")
 
@@ -217,4 +228,3 @@ GOOGLE_SEARCH_ENGINE_ID = os.getenv("GOOGLE_SEARCH_ENGINE_ID")
 # Waitlist email method configuration
 raw_gmail_env = os.getenv("USE_GMAIL_FOR_WAITLIST_EMAILS", "false")
 USE_GMAIL_FOR_WAITLIST_EMAILS = str(raw_gmail_env).strip().lower() == "true"
-

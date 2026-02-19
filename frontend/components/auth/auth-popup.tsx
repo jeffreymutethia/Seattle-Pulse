@@ -6,6 +6,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import Image from "next/image";
 import { trackEvent } from "@/lib/mixpanel";
@@ -40,6 +41,7 @@ export function AuthPopup({
           paddingRight: "1.25rem",
         }}
       >
+        <DialogTitle className="sr-only">Authentication required</DialogTitle>
         
         {/* Close Button */}
         

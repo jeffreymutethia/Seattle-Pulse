@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { usePasswordChange } from "@/app/hooks/use-auth";
 import { ChangePasswordReqRequest } from "@/app/types/auth";
+import { FULL_LOGO_SRC } from "@/lib/brand-assets";
 
 export default function ResetPassword() {
   const [newPassword, setNewPassword] = useState("");
@@ -66,7 +67,7 @@ export default function ResetPassword() {
 
         <div className="w-full  flex justify-center pb-8">
           <img
-            src="https://seattlepulse-logos.s3.us-east-1.amazonaws.com/Seattle+Pulse_Logo/sp_full+color/sp_full+color_light+background/sp_logo_color_light_bg_1024px_PNG24.png"
+            src={FULL_LOGO_SRC}
             className="w-36 h-36"
           />
         </div>

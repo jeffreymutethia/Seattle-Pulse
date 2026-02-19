@@ -112,10 +112,14 @@ To configure API endpoints or other secrets, create a file named `.env.local` (i
 # Example: FRONTEND .env.local
 
 # The base URL for Seattle Pulse API
-NEXT_PUBLIC_API_URL=http://localhost:5001
+NEXT_PUBLIC_API_BASE_URL=http://localhost:5050/api/v1
+INTERNAL_API_BASE_URL=http://backend:5000/api/v1
+INTERNAL_API_URL_NOTIFICATION=http://backend:5000
+NEXT_PUBLIC_API_URL_NOTIFICATION=http://localhost:5050
 ```
 
-- **NEXT_PUBLIC_API_URL**: The public-facing URL for your backend API.  
+- **NEXT_PUBLIC_API_BASE_URL**: Base URL for backend API endpoints.
+- **NEXT_PUBLIC_API_URL_NOTIFICATION**: Base URL for notification/socket and non-`/api/v1` endpoints.
 - Add or remove variables as needed for maps, analytics, etc.
 
 > **Important**: Never commit secrets or private tokens to the repo. Use `.env.local` or a secure manager like Vault / AWS Secrets Manager in production.

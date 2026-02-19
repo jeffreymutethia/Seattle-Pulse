@@ -170,3 +170,6 @@ cache/*
 instance/test.db
 test.db
 .DS_Store
+
+# Local sqlite artifacts
+instance/site.db

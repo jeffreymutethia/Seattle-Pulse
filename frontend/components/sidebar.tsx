@@ -6,6 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { MoreHorizontal, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { FULL_LOGO_SRC } from "@/lib/brand-assets";
 import { Button } from "@/components/ui/button";
 import { AvatarWithFallback } from "@/components/ui/avatar-with-fallback";
 import { apiClient } from "@/app/api/api-client";
@@ -73,7 +74,7 @@ export function Sidebar({ isGuest = false }: SidebarProps) {
       <div className="hidden md:flex flex-col h-full w-[250px] border-r bg-white">
         <div className="flex justify-center h-16 items-center p-16">
           <Image
-            src="https://seattlepulse-logos.s3.us-east-1.amazonaws.com/Seattle+Pulse_Logo/sp_full+color/sp_full+color_light+background/sp_logo_color_light_bg_1024px_PNG24.png"
+            src={FULL_LOGO_SRC}
             alt="Seattle Pulse Logo"
             width={195}
             height={195}
