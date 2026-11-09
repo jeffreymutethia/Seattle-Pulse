@@ -14,7 +14,7 @@ if (destination === root || (existsSync(destination) && readdirSync(destination)
   throw new Error("The hosting snapshot destination must be empty.");
 }
 mkdirSync(destination, { recursive: true });
-const assets = ["brand/", "demo/", "fonts/", "default-profile.png"];
+const assets = ["brand/", "demo/", "fonts/", "default-profile.png", "bg-up.png", "Feed.svg", "Pulse.svg", "Forward.png"];
 const files = git("ls-files", "-z").split("\0").filter(Boolean);
 for (const file of files) {
   const isFrontend = file.startsWith("frontend/") &&

@@ -13,7 +13,9 @@ export default function ProfileHeader({
   userData,
   onFollowToggle,
   isMyProfile,
-}: ProfileData) {
+  onEditProfile,
+  hideShare = false,
+}: ProfileData & { onEditProfile?: () => void; hideShare?: boolean }) {
   const router = useRouter();
   const [isStartingChat, setIsStartingChat] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
@@ -131,7 +133,8 @@ export default function ProfileHeader({
             {isMyProfile ? (
               <Button
                 onClick={() => {
-                  window.location.href = "/setting";
+                  if (onEditProfile) onEditProfile();
+                  else window.location.href = "/setting";
                 }}
                 className="px-8 py-5 rounded-xl border-black border-2 text-lg bg-transparent text-black hover:bg-transparent"
               >
@@ -161,7 +164,7 @@ export default function ProfileHeader({
               </>
             )}
 
-            <button
+            {!hideShare && <button
               onClick={handleShareClick}
               disabled={isSharing}
               className="border-black rounded-lg border-2 py-2 px-4 hover:bg-gray-50 disabled:opacity-50"
@@ -173,7 +176,7 @@ export default function ProfileHeader({
                 height={20}
                 priority
               />
-            </button>
+            </button>}
           </div>
 
           {/* Stats */}
@@ -276,7 +279,8 @@ export default function ProfileHeader({
           {isMyProfile ? (
             <Button
               onClick={() => {
-                window.location.href = "/setting";
+                if (onEditProfile) onEditProfile();
+                else window.location.href = "/setting";
               }}
               className="border-2 w-full border-black text-black bg-transparent hover:bg-transparent rounded-3xl px-4 py-3 text-sm"
             >
@@ -306,7 +310,7 @@ export default function ProfileHeader({
             </>
           )}
 
-          <button
+          {!hideShare && <button
             onClick={handleShareClick}
             disabled={isSharing}
             className="border-black rounded-lg border-2 py-2 px-3 hover:bg-gray-50 disabled:opacity-50"
@@ -318,7 +322,7 @@ export default function ProfileHeader({
               height={18}
               priority
             />
-          </button>
+          </button>}
         </div>
       </div>
       </div>

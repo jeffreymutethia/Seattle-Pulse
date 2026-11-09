@@ -126,7 +126,7 @@ jobs:
       - name: Build the self-contained demo
         run: npm run build:demo
 
-      - name: Verify the guest walkthrough in Chrome
+      - name: Verify the browsable product in Chrome
         run: npm run test:demo
 
       - name: Upload browser screenshots

@@ -7,11 +7,12 @@ import dynamic from "next/dynamic";
 // import { MobileHeader } from "@/components/mobile-header";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { IS_DEMO } from "@/lib/demo";
+import { DemoShell } from "./demo/demo-shell";
 
 const Sidebar = dynamic(() => import("@/components/sidebar").then(m => m.Sidebar), { ssr: false });
 const GuestSidebar = dynamic(() => import("@/components/guest-sidebar").then(m => m.GuestSidebar), { ssr: false });
 
-function ClientLayout({
+function LiveClientLayout({
   children,
   hasSession,
 }: {
@@ -77,4 +78,6 @@ function ClientLayout({
   );
 }
 
-export default ClientLayout;
+export default function ClientLayout(props: { children: React.ReactNode; hasSession: boolean }) {
+  return IS_DEMO ? <DemoShell>{props.children}</DemoShell> : <LiveClientLayout {...props} />;
+}

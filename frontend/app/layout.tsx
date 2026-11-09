@@ -8,6 +8,7 @@ import ClientLayout from "./client-layout";
 import { NotificationProvider } from "./context/notification-context";
 import { MixpanelProvider } from "@/components/mixpanel-provider";
 import { IS_DEMO } from "@/lib/demo";
+import { DemoSessionBoundary } from "./demo/demo-session";
 
 const poppins = localFont({
   src: [
@@ -94,13 +95,13 @@ export default async function RootLayout({
         ) : null}
       </head>
       <body className={poppins.className}>
-        <AuthProvider>
+        <DemoSessionBoundary><AuthProvider>
           <MixpanelProvider>
             <NotificationProvider>
               <ClientLayout hasSession={hasSession}>{children}</ClientLayout>
             </NotificationProvider>
           </MixpanelProvider>
-        </AuthProvider>
+        </AuthProvider></DemoSessionBoundary>
       </body>
     </html>
   );

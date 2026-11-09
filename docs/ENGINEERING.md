@@ -22,11 +22,17 @@ The current [combined feed](../backend/app/api/content.py) first queries matchin
 
 Separate [MyPulse logic](../backend/app/api/feed.py) limits results to followed authors and orders by an engagement score with time decay: `(2 × reactions + 3 × comments + 5 × shares) × exp(−age_seconds / 86400)`. This ranking belongs to the full-system following feed.
 
-## What the hosted walkthrough exercises
+## What the browsable demo exercises
 
-The hosted demo uses bundled, explicitly fictional fixtures at the frontend service boundary. It reuses the application's feed, location selection, story, discussion components, and TypeScript types. A reviewer can open a populated Seattle neighborhood feed as a guest, switch from Capitol Hill to Ballard, see different stories, and open a seeded discussion. Images ship with the app. No login or live backend is required.
+The static build uses typed fixtures at [`postServices.ts`](../frontend/app/services/postServices.ts) and [`contentService.ts`](../frontend/app/services/contentService.ts). Eight original place guides and the credited Seattle photographs are carried forward from the citywide edition. Market Notes, Hill Notes, Ballard Notes and the other publishers are fictional editorial identities, each with a distinct bundled avatar.
 
-Ingestion, database queries, authentication, persistent writes, social ranking, messaging, and mobile behavior are full-system implementation paths documented in this repository; they are not exercised by the hosted fixtures. The [Docker stack](../docker-compose.yml) runs Next.js, Flask, PostgreSQL, and Redis. Browser API calls use `localhost:5050`; server-side calls use Docker DNS at `backend:5000`. See [the local architecture](ARCHITECTURE.md) and [Docker walkthrough](DEMO.md).
+The Feed opens to All Seattle and applies the existing neighborhood selector to the fixtures. The dedicated demo sign-in route adapts the original login screen's artwork, typography, branding and form card. A [`DemoSessionBoundary`](../frontend/app/demo/demo-session.tsx), mounted only in demo mode, stores the reader session, followed source IDs, comments and edited profile in this tab's `sessionStorage`. Sign-in never changes the separately stored feed location. It is a local simulation, not server authentication.
+
+Real static routes expose The Feed, My Pulse and Profile. The existing Sidebar and MobileBottomNav delegate to demo navigation when the build flag is enabled. My Pulse selects guides by followed publisher IDs and updates immediately on follow/unfollow. This demonstrates a source-shaped feed, without applying the backend's time-decay ranking. Profile reuses the original ProfileHeader with a local edit callback and shows saved guides with their publisher credits, rather than claiming the demo reader authored them. Both feeds and the profile collections open the same existing comment modal and sample discussions.
+
+The demo exposes only completed fixture-backed destinations. API-dependent story uploads, messaging, notifications, account settings and location maps remain full-system implementation paths. The normal build keeps its existing navigation and API behavior; the optional profile callback defaults to its original settings route.
+
+Ingestion, database queries, authentication, persistent writes, social ranking, messaging, and mobile behavior are full-system implementation paths documented in this repository; they are not exercised by the static fixtures. The [Docker stack](../docker-compose.yml) runs Next.js, Flask, PostgreSQL, and Redis. Browser API calls use `localhost:5050`; server-side calls use Docker DNS at `backend:5000`. See [the local architecture](ARCHITECTURE.md) and [Docker walkthrough](DEMO.md).
 
 The [Flutter app](../mobile/lib/) has its own feed, story, comment, profile, and messaging implementations backed by the Flask API. Its current [API client](../mobile/lib/src/core/api/api_client.dart) targets the deployed API; running mobile against Docker requires updating that base URL for the simulator or device. Mobile is optional for the Docker web/API walkthrough.
 

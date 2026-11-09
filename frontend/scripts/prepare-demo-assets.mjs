@@ -10,7 +10,7 @@ if (lstatSync(destination, { throwIfNoEntry: false })?.isSymbolicLink()) {
 }
 rmSync(destination, { recursive: true, force: true });
 mkdirSync(destination, { recursive: true });
-for (const asset of ["brand", "demo", "fonts", "default-profile.png"]) {
+for (const asset of ["brand", "demo", "fonts", "default-profile.png", "bg-up.png", "Feed.svg", "Pulse.svg", "Forward.png"]) {
   cpSync(new URL(asset, source), join(destination, asset), { recursive: true });
 }
 cpSync(new URL("../app/favicon.ico", import.meta.url), join(destination, "favicon.ico"));

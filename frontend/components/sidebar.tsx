@@ -10,6 +10,8 @@ import { FULL_LOGO_SRC } from "@/lib/brand-assets";
 import { Button } from "@/components/ui/button";
 import { AvatarWithFallback } from "@/components/ui/avatar-with-fallback";
 import { apiClient } from "@/app/api/api-client";
+import { IS_DEMO } from "@/lib/demo";
+import { DemoSidebar } from "@/app/demo/demo-navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,6 +34,10 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isGuest = false }: SidebarProps) {
+  return IS_DEMO ? <DemoSidebar /> : <LiveSidebar isGuest={isGuest} />;
+}
+
+function LiveSidebar({ isGuest = false }: SidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);

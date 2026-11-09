@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react"
 import Image from "next/image"
+import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
@@ -221,6 +222,10 @@ export default function CommentModal({
               </div>
               <div className="p-5 pt-8 md:p-8">
                 <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-emerald-800">Neighborhood guide · {contentDetails.location}</p>
+                <div className="mb-4 flex items-center gap-3" data-cy="discussion-publisher">
+                  <Image src={contentDetails.user.profile_picture_url || "/demo/neighbor.svg"} alt={contentDetails.user.username} width={40} height={40} className="rounded-full" />
+                  <div><p className="text-sm font-semibold">{contentDetails.user.username}</p><p className="text-xs text-gray-500">Fictional demo publisher</p></div>
+                </div>
                 <DialogTitle className="pr-4 text-xl leading-snug">{contentDetails.title}</DialogTitle>
                 <p id="demo-discussion-description" className="mt-3 text-sm leading-6 text-gray-600">{contentDetails.description}</p>
                 {contentDetails.source_url && <a className="mt-2 inline-block text-sm font-medium text-emerald-800 underline" href={contentDetails.source_url} target="_blank" rel="noreferrer">More about this place</a>}
@@ -245,6 +250,7 @@ export default function CommentModal({
                   <textarea id="demo-comment" name="comment" required maxLength={300} rows={2} className="w-full rounded-md border px-3 py-2 text-sm" />
                   <Button type="submit" size="sm">Add demo comment</Button>
                 </form>}
+                {!demoReader?.signedIn && <Link href="/auth/login/" className="mt-5 inline-block text-sm font-semibold text-emerald-800 underline underline-offset-4">Sign in to join the demo discussion</Link>}
                 <p className="mt-5 text-xs leading-5 text-gray-500">Sample conversation. Comments you add stay in this tab’s session.</p>
               </div>
             </div>
