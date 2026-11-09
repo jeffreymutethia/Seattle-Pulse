@@ -27,11 +27,12 @@ The account owner needs to approve `vercel login`, or connect the Vercel integra
 
 [`frontend/vercel.json`](../frontend/vercel.json) already declares the install, build and output settings. The static export contains real HTML entry points for `/`, `/auth/login/`, `/mypulse/` and `/profile/`. It does not need serverless functions, Flask, a database or the Next.js server preset. See Vercel's [configuration reference](https://vercel.com/docs/project-configuration/vercel-json).
 
-For CLI deployment from the PR checkout:
+For CLI deployment, run from the repository root because the linked project
+uses `frontend` as its Root Directory. This follows Vercel's
+[monorepo CLI guidance](https://vercel.com/docs/monorepos):
 
 ```sh
 git switch feat/portfolio-demo
-cd frontend
 npx vercel login
 npx vercel link
 npx vercel deploy
