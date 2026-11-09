@@ -22,6 +22,7 @@ import { useShareApi } from "@/app/hooks/use-share-api"
 import { Toast } from "@/components/ui/toast"
 import { toast } from "react-hot-toast"
 import { trackEvent } from "@/lib/mixpanel"
+import { IS_DEMO } from "@/lib/demo"
 
 interface ExtendedCommentModalProps extends CommentModalProps {
   onPostReactionSelect?: (postId: number, reactionType: string) => void
@@ -206,6 +207,30 @@ export default function CommentModal({
   };
 
   if (!isOpen) return null
+
+  if (IS_DEMO) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent data-cy="demo-discussion" aria-describedby="demo-discussion-description" className="w-[calc(100vw-2rem)] max-w-4xl max-h-[90dvh] overflow-y-auto rounded-2xl p-0">
+          {contentDetails ? <>
+            <div className="grid md:grid-cols-2">
+              <div className="relative min-h-40 md:min-h-full bg-emerald-50">
+                <Image src={contentDetails.image_url || "/demo/pike-street.svg"} alt={contentDetails.title} fill className="object-cover rounded-t-2xl md:rounded-l-2xl md:rounded-tr-none" sizes="(max-width: 768px) 100vw, 450px" />
+              </div>
+              <div className="p-5 pt-8 md:p-8">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-emerald-800">Fictional story · {contentDetails.location}</p>
+                <DialogTitle className="pr-4 text-xl leading-snug">{contentDetails.title}</DialogTitle>
+                <p id="demo-discussion-description" className="mt-3 text-sm leading-6 text-gray-600">{contentDetails.description}</p>
+                <h3 className="mt-5 border-t pt-4 text-sm font-semibold">Seeded discussion</h3>
+                <div className="mt-4 space-y-5">{comments.map(comment => <CommentItem key={comment.id} comment={comment} contentId={contentDetails.id} contentType="user_content" />)}</div>
+                <p className="mt-5 border-t pt-4 text-xs leading-5 text-gray-500">Fictional people and conversation. This walkthrough is read only; accounts and posting are part of the full local system.</p>
+              </div>
+            </div>
+          </> : <div className="p-8"><DialogTitle>Story discussion</DialogTitle><p id="demo-discussion-description">{error || "Loading discussion…"}</p></div>}
+        </DialogContent>
+      </Dialog>
+    )
+  }
 
   if (isLoading || error || !contentDetails) {
     if (isLoading) {

@@ -1,9 +1,11 @@
+import { IS_DEMO } from "./demo";
 import mixpanel from "mixpanel-browser";
 
 let isInitialized = false;
 
 // Initialize Mixpanel
 export const initMixpanel = () => {
+  if (IS_DEMO) return;
   const token = process.env.NEXT_PUBLIC_MIXPANEL_TOKEN;
   
   if (!token) {
@@ -105,6 +107,7 @@ export const trackEvent = (
   eventName: string,
   properties?: Record<string, unknown>
 ) => {
+  if (IS_DEMO) return;
   if (!isInitialized) {
     console.warn("Mixpanel not initialized. Event not tracked:", eventName);
     return;
@@ -137,6 +140,7 @@ export const trackEvent = (
 
 // Identify user (call after email verification)
 export const identifyUser = (userId: number | string) => {
+  if (IS_DEMO) return;
   if (!isInitialized) {
     console.warn("Mixpanel not initialized. Cannot identify user.");
     return;

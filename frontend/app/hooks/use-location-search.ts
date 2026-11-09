@@ -94,9 +94,9 @@ export const useHomeLocationSearch = () => {
   // Hard-coded launch set as specified in the requirements - always show these first
   const launchSet: HomeLocationOption[] = [
     { value: 'Seattle', label: 'Seattle', isPreset: true },
-    { value: 'Capitol Hill', label: 'Capitol Hill', isPreset: true },
-    { value: 'Ballard', label: 'Ballard', isPreset: true },
-    { value: 'U District', label: 'U District', isPreset: true },
+    { value: 'Capitol Hill, Seattle', label: 'Capitol Hill, Seattle', isPreset: true },
+    { value: 'Ballard, Seattle', label: 'Ballard, Seattle', isPreset: true },
+    { value: 'U District, Seattle', label: 'U District, Seattle', isPreset: true },
     
   ];
 

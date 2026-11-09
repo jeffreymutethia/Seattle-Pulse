@@ -27,7 +27,14 @@ import { useHideContent } from "@/app/hooks/use-hide";
 import { useShare } from "@/app/hooks/use-share";
 import { trackEvent } from "@/lib/mixpanel";
 
+import { IS_DEMO } from "@/lib/demo";
+import { DemoFeed } from "./demo/demo-feed";
+
 export default function Page() {
+  return IS_DEMO ? <DemoFeed /> : <LiveFeed />;
+}
+
+function LiveFeed() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);

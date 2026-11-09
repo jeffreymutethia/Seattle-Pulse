@@ -1,8 +1,34 @@
-# Demo Walkthrough
+# Demo walkthroughs
 
-This is a user-focused script that works in about 2 minutes.
+## Hosted portfolio walkthrough
 
-## 1) Start The Stack
+The public portfolio build opens as a guest in **Capitol Hill, Seattle**. Read a
+story, choose **Ballard, Seattle** in the neighborhood selector, and open a
+Ballard story to read its seeded discussion. The stories, people, conversations
+and original bundled illustrations are fictional. No account, API, map service,
+database, content provider or tracking key is needed.
+
+To build and exercise that same artifact locally:
+
+```bash
+cd frontend
+npm ci
+npm run build:demo
+npm run test:demo
+```
+
+To browse it yourself, run `npm run serve:demo` and open `http://localhost:3000`.
+This uses the existing Next.js feed, selector, story cards and comment modal;
+`postServices.ts` and `contentService.ts` supply typed fixtures only when
+`NEXT_PUBLIC_DEMO_MODE=true`. The dedicated `demo/` build exports the root page
+and assets without exposing the full application's account routes.
+
+## Full local system
+
+The Docker quickstart below exercises the Flask API and persistent database.
+The portfolio flag is off in the normal frontend build and Docker stack.
+
+### 1) Start the stack
 ```bash
 make demo
 ```

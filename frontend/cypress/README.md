@@ -125,3 +125,27 @@ To add new tests:
 4. Commit the new spec and any fixtures after the tests pass.
 
 For additional guidance, see the [Cypress documentation](https://docs.cypress.io/).
+
+## Portfolio demo release check
+
+The dedicated demo spec is independent of the legacy authentication suite. It
+uses the shipped fixture service with no API stubs and repeats the guest journey
+in fresh desktop (1440 × 1000) and mobile (390 × 844) sessions: populated Capitol
+Hill feed, switch to Ballard, verify the old story set is gone, and open a story's
+seeded discussion.
+
+```bash
+npm run build:demo
+npm run test:demo
+```
+
+To run the exact same test against an already deployed preview:
+
+```bash
+CYPRESS_BASE_URL=https://your-verified-preview.example npm run test:demo:preview
+```
+
+The `Demo walkthrough (desktop + mobile)` CI job is blocking: failures fail the
+workflow. Screenshots are saved in `cypress/screenshots` and uploaded as a CI
+artifact on every run. A repository owner can also select this named check in
+GitHub branch-protection settings if required checks are enabled.

@@ -16,6 +16,7 @@ import {
 } from "../services/notification-service";
 
 import { API_BASE_URL_NOTIFICATION } from "@/lib/config";
+import { IS_DEMO } from "@/lib/demo";
 
 
 interface NotificationContextType {
@@ -46,6 +47,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   const [userId, setUserId] = useState<number | null>(null);
 
   useEffect(() => {
+    if (IS_DEMO) { setLoading(false); return; }
     const storedUserId = sessionStorage.getItem("user_id");
     if (storedUserId) {
       setUserId(parseInt(storedUserId, 10));

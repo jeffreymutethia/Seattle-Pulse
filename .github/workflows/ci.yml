@@ -57,7 +57,8 @@ jobs:
         run: |
           timeout 240s pytest -q \
             tests/auth/test_login.py \
-            tests/content/test_get_guest_feed.py
+            tests/content/test_get_guest_feed.py \
+            tests/content/test_demo_seed.py
 
   frontend:
     name: Frontend (lint + build)
@@ -100,3 +101,38 @@ jobs:
           else
             echo "No frontend test script found. Skipping."
           fi
+
+  demo-walkthrough:
+    name: Demo walkthrough (desktop + mobile)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build the self-contained demo
+        run: npm run build:demo
+
+      - name: Verify the guest walkthrough in Chrome
+        run: npm run test:demo
+
+      - name: Upload browser screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-browser-screenshots
+          path: frontend/cypress/screenshots
+          if-no-files-found: ignore

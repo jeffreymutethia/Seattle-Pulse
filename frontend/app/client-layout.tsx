@@ -6,6 +6,7 @@ import { useAuth } from "./context/auth-context";
 import dynamic from "next/dynamic";
 // import { MobileHeader } from "@/components/mobile-header";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
+import { IS_DEMO } from "@/lib/demo";
 
 const Sidebar = dynamic(() => import("@/components/sidebar").then(m => m.Sidebar), { ssr: false });
 const GuestSidebar = dynamic(() => import("@/components/guest-sidebar").then(m => m.GuestSidebar), { ssr: false });
@@ -67,9 +68,9 @@ function ClientLayout({
           )}
         </div>
       )}
-      <main id="app-main" className="flex-1 overflow-auto  pb-20 md:pt-0 md:pb-0">{children}</main>
+      <main id="app-main" className={`min-w-0 flex-1 overflow-auto ${IS_DEMO ? "" : "pb-20 md:pt-0 md:pb-0"}`}>{children}</main>
       {/* Mobile Bottom Navigation */}
-      {!isAuthPage && !isOnboardingPage && !isPrivacyPage && !isTermsPage && (
+      {!IS_DEMO && !isAuthPage && !isOnboardingPage && !isPrivacyPage && !isTermsPage && (
         <MobileBottomNav />
       )}
     </div>
