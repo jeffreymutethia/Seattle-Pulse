@@ -9,6 +9,7 @@ export interface CommentModalProps {
 }
 
 export interface ContentDetails {
+  source_url?: string;
   id: number;
   title: string;
   description: string;

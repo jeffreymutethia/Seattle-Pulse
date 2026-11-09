@@ -25,7 +25,7 @@ export function GuestSidebar() {
         <p className="text-xs font-semibold uppercase tracking-widest text-emerald-800">Explore Seattle Pulse</p>
         <p className="mt-4 font-semibold text-gray-950">A city is many neighborhoods.</p>
         <p className="mt-2">Find the stories and conversations that matter on your own streets.</p>
-        <ol className="mt-6 list-decimal space-y-3 pl-4"><li>Browse Capitol Hill</li><li>Switch to Ballard</li><li>Open a discussion</li></ol>
+        <ol className="mt-6 list-decimal space-y-3 pl-4"><li>Browse All Seattle</li><li>Pick a neighborhood</li><li>Open a discussion</li></ol>
         <div className="mt-8 border-t pt-5"><p className="font-semibold text-gray-950">Built by Jeffrey Mutethia</p><p className="mt-2 text-xs leading-5">Web · backend · mobile · infrastructure</p>
           <a href="https://github.com/jeffreymutethia/Seattle-Pulse" className="mt-4 inline-block font-medium text-emerald-800 underline underline-offset-4">Inspect the project ↗</a>
         </div>

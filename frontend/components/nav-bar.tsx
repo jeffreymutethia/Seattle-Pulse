@@ -23,6 +23,7 @@ import Image from "next/image";
 import { apiClient } from "@/app/api/api-client";
 import { FULL_LOGO_SRC } from "@/lib/brand-assets";
 import { IS_DEMO } from "@/lib/demo";
+import { demoNeighborhoods } from "@/app/demo/fixtures";
 
 // Dynamic import outside component to prevent re-creation
 const SearchWithResults = dynamic(() => import("./search-component"), {
@@ -149,7 +150,7 @@ const NavBar = ({
   const handleLocationSearch = (term: string) => {
     setSearchTerm(term);
     if (IS_DEMO) {
-      setSearchResults(defaultNeighborhoods.filter(item => item.value.includes(", Seattle") && item.name.toLowerCase().includes(term.toLowerCase())).filter(item => !item.value.startsWith("U District")).map(item => ({ value: item.value, label: item.name })));
+      setSearchResults(demoNeighborhoods.filter(item => item.name.toLowerCase().includes(term.trim().toLowerCase())).map(item => ({ value: item.value, label: item.name })));
       return;
     }
     if (term.trim()) {
@@ -381,7 +382,7 @@ const NavBar = ({
                 aria-label="Choose neighborhood"
                 className="font-semibold text-sm md:text-base flex items-center gap-2"
               >
-                {selectedNeighborhood}
+                {IS_DEMO && selectedNeighborhood === "Seattle" ? "All Seattle" : selectedNeighborhood}
                 <ChevronDown className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -416,13 +417,13 @@ const NavBar = ({
               {/* Default Neighborhoods */}
               {(!searchTerm || searchTerm.length <= 2) && (
                 <>
-                  {defaultNeighborhoods.filter(item => !IS_DEMO || ["Capitol Hill, Seattle", "Ballard, Seattle"].includes(item.value)).map((neighborhood) => (
+                  {(IS_DEMO ? demoNeighborhoods : defaultNeighborhoods).map((neighborhood) => (
                     <DropdownMenuItem
                       key={neighborhood.value}
                       onClick={() => handleNeighborhoodChange(neighborhood.value)}
                       className={cn(
                         "cursor-pointer text-sm py-2 px-3 rounded-md hover:bg-gray-100 transition-colors",
-                        selectedNeighborhood === neighborhood.name && "bg-gray-100 font-medium"
+                        selectedNeighborhood === neighborhood.value && "bg-gray-100 font-medium"
                       )}
                     >
                       {neighborhood.name}

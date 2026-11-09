@@ -1,14 +1,14 @@
 /// <reference types="cypress" />
 
-const capitolHillStory = "A little more room to linger on Pike Street";
-const ballardStory = "A neighborhood table at the Ballard market";
+const capitolHillStory = "An hour at Cal Anderson Park";
+const ballardStory = "A walk through the Ballard Locks";
 const ballardComment =
-  "A shared table would make it easier to meet the people behind the stalls.";
+  "The view from the fish ladder is worth the extra few minutes.";
 
 // One release-blocking journey, repeated at desktop and mobile sizes in fresh
 // guest sessions. No network stubs: fixtures must come from the shipped app.
 describe("Portfolio walkthrough", () => {
-  it("switches neighborhoods, replaces the stories, and opens the seeded discussion", () => {
+  it("starts citywide, filters and reloads, and lets a demo reader comment locally", () => {
     for (const viewport of [
       { name: "desktop", width: 1440, height: 1000 },
       { name: "mobile", width: 390, height: 844 },
@@ -23,26 +23,23 @@ describe("Portfolio walkthrough", () => {
         },
       });
 
-      cy.contains(/fictional/i).should("be.visible");
-      if (viewport.name === "desktop") {
-        cy.contains("Explore Seattle Pulse").should("be.visible");
-      }
-      cy.get('[aria-label="Choose neighborhood"]')
-        .should("be.visible")
-        .and("contain.text", "Capitol Hill");
-      cy.contains('[data-cy="post-card"]', capitolHillStory).should("be.visible");
-      cy.get('[data-cy="post-card"]').each(($card) => {
-        cy.wrap($card).should("contain.text", "Capitol Hill, Seattle");
-      });
-      cy.contains('[data-cy="post-card"]', ballardStory).should("not.exist");
-      cy.get('[data-cy="post-card"] img').should(($images) => {
-        for (const image of $images.toArray() as HTMLImageElement[]) {
-          expect(image.complete && image.naturalWidth > 0, image.src).to.equal(true);
-        }
+      cy.contains("Seattle, block by block.").should("be.visible");
+      cy.get('[aria-label="Choose neighborhood"]').should("contain.text", "All Seattle");
+      cy.get('[data-cy="post-card"]').should("have.length", 8);
+      cy.contains('[data-cy="post-card"]', capitolHillStory).should("exist");
+      cy.contains('[data-cy="post-card"]', ballardStory).should("exist");
+      cy.contains('[data-cy="post-card"]', "The long way along Alki").should("exist");
+      cy.get('[data-cy="post-card"]').first().find('img[src$=".webp"]').should(($image) => {
+        const image = $image[0] as HTMLImageElement;
+        expect(image.complete && image.naturalWidth > 0, image.src).to.equal(true);
       });
       // Freezing timers while capturing can trip React 19 scheduling invariants.
       cy.screenshot(`demo-${viewport.name}-feed`, { capture: "viewport", disableTimersAndAnimations: false });
 
+      cy.contains("button", "Try demo sign-in").click();
+      cy.contains("Welcome to Seattle Pulse").should("be.visible");
+      cy.contains("button", "Continue as demo reader").click();
+      cy.contains("Demo reader signed in").should("be.visible");
       cy.get('[aria-label="Choose neighborhood"]').click();
       cy.contains('[role="menuitem"]', /^Ballard, Seattle$/).click();
       cy.get('[aria-label="Choose neighborhood"]').should("contain.text", "Ballard");
@@ -72,6 +69,13 @@ describe("Portfolio walkthrough", () => {
           }
         });
       });
+      cy.get("#demo-comment").type("Saving this walk for the weekend.");
+      cy.contains("button", "Add demo comment").click();
+      cy.contains("Saving this walk for the weekend.").should("be.visible");
+      cy.reload();
+      cy.contains("Demo reader signed in").should("be.visible");
+      cy.contains('[data-cy="post-card"]', ballardStory).find('[data-cy="open-discussion"]').click();
+      cy.contains("Saving this walk for the weekend.").should("be.visible");
       cy.window().then((win) => {
         const resources = win.performance.getEntriesByType("resource")
           .map((entry) => new URL(entry.name, win.location.href));

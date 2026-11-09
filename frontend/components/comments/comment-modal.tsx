@@ -26,6 +26,7 @@ import { IS_DEMO } from "@/lib/demo"
 
 interface ExtendedCommentModalProps extends CommentModalProps {
   onPostReactionSelect?: (postId: number, reactionType: string) => void
+  demoReader?: { signedIn: boolean; comments: string[]; onAddComment: (postId: number, content: string) => void }
 }
 
 function useMediaQuery(query: string) {
@@ -53,6 +54,7 @@ export default function CommentModal({
   isAuthenticated,
   requireAuth,
   onPostReactionSelect,
+  demoReader,
 }: ExtendedCommentModalProps) {
   const [postReaction, setPostReaction] = useState<string | null>(null)
   const [postTotalReactions, setPostTotalReactions] = useState<number>(0)
@@ -215,15 +217,35 @@ export default function CommentModal({
           {contentDetails ? <>
             <div className="grid md:grid-cols-2">
               <div className="relative min-h-40 md:min-h-full bg-emerald-50">
-                <Image src={contentDetails.image_url || "/demo/pike-street.svg"} alt={contentDetails.title} fill className="object-cover rounded-t-2xl md:rounded-l-2xl md:rounded-tr-none" sizes="(max-width: 768px) 100vw, 450px" />
+                <Image src={contentDetails.image_url || "/demo/pike-place.webp"} alt={contentDetails.title} fill className="object-cover rounded-t-2xl md:rounded-l-2xl md:rounded-tr-none" sizes="(max-width: 768px) 100vw, 450px" />
               </div>
               <div className="p-5 pt-8 md:p-8">
-                <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-emerald-800">Fictional story · {contentDetails.location}</p>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-emerald-800">Neighborhood guide · {contentDetails.location}</p>
                 <DialogTitle className="pr-4 text-xl leading-snug">{contentDetails.title}</DialogTitle>
                 <p id="demo-discussion-description" className="mt-3 text-sm leading-6 text-gray-600">{contentDetails.description}</p>
-                <h3 className="mt-5 border-t pt-4 text-sm font-semibold">Seeded discussion</h3>
+                {contentDetails.source_url && <a className="mt-2 inline-block text-sm font-medium text-emerald-800 underline" href={contentDetails.source_url} target="_blank" rel="noreferrer">More about this place</a>}
+                <h3 className="mt-5 border-t pt-4 text-sm font-semibold">Sample discussion</h3>
                 <div className="mt-4 space-y-5">{comments.map(comment => <CommentItem key={comment.id} comment={comment} contentId={contentDetails.id} contentType="user_content" />)}</div>
-                <p className="mt-5 border-t pt-4 text-xs leading-5 text-gray-500">Fictional people and conversation. This walkthrough is read only; accounts and posting are part of the full local system.</p>
+                {demoReader?.comments.map((content, index) => (
+                  <div className="mt-4 rounded-lg bg-emerald-50 px-3 py-2 text-sm" key={index}>
+                    <p className="font-semibold">You · demo reader</p>
+                    <p className="break-words">{content}</p>
+                  </div>
+                ))}
+                {demoReader?.signedIn && <form className="mt-5 space-y-2 border-t pt-4" onSubmit={(event) => {
+                  event.preventDefault();
+                  const form = event.currentTarget;
+                  const text = String(new FormData(form).get("comment") ?? "").trim();
+                  if (text) {
+                    demoReader.onAddComment(contentDetails.id, text);
+                    form.reset();
+                  }
+                }}>
+                  <label className="block text-sm font-medium" htmlFor="demo-comment">Your demo comment</label>
+                  <textarea id="demo-comment" name="comment" required maxLength={300} rows={2} className="w-full rounded-md border px-3 py-2 text-sm" />
+                  <Button type="submit" size="sm">Add demo comment</Button>
+                </form>}
+                <p className="mt-5 text-xs leading-5 text-gray-500">Sample conversation. Comments you add stay in this tab’s session.</p>
               </div>
             </div>
           </> : <div className="p-8"><DialogTitle>Story discussion</DialogTitle><p id="demo-discussion-description">{error || "Loading discussion…"}</p></div>}
