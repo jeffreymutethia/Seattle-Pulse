@@ -58,6 +58,11 @@ describe("Portfolio walkthrough", () => {
       cy.get('[data-cy="demo-discussion"]').should("be.visible").and("have.css", "opacity", "1").within(() => {
         cy.contains(ballardStory).should("be.visible");
         cy.contains(ballardComment).should("be.visible");
+        cy.get("img").should(($images) => {
+          for (const image of $images.toArray() as HTMLImageElement[]) {
+            expect(image.complete && image.naturalWidth > 0, image.src).to.equal(true);
+          }
+        });
       });
       cy.window().then((win) => {
         const resources = win.performance.getEntriesByType("resource")

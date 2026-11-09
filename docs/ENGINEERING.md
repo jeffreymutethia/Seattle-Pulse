@@ -31,3 +31,5 @@ Ingestion, database queries, authentication, persistent writes, social ranking, 
 The [Flutter app](../mobile/lib/) has its own feed, story, comment, profile, and messaging implementations backed by the Flask API. Its current [API client](../mobile/lib/src/core/api/api_client.dart) targets the deployed API; running mobile against Docker requires updating that base URL for the simulator or device. Mobile is optional for the Docker web/API walkthrough.
 
 The repository includes [ECS task definitions](../backend/ecs-task-def.json), worker/beat definitions, Lambda ingestion code, Docker builds, and [CI](../.github/workflows/ci.yml). These infrastructure paths are documented separately from the self-contained hosted walkthrough.
+
+Backend tests stub the module's startup OpenStreetMap lookups before importing the app, so API and seed regressions run without Nominatim or Overpass. Those checks validate location-label filtering against stored rows; they do not validate live boundary downloads or geographic classification.
