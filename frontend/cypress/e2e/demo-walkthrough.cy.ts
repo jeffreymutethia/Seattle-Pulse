@@ -59,6 +59,14 @@ describe("Portfolio walkthrough", () => {
         cy.contains(ballardStory).should("be.visible");
         cy.contains(ballardComment).should("be.visible");
       });
+      cy.window().then((win) => {
+        const resources = win.performance.getEntriesByType("resource")
+          .map((entry) => new URL(entry.name, win.location.href));
+        expect(resources.filter((url) => url.origin !== win.location.origin).map((url) => url.href),
+          "all scripts, images, fonts, and requests use the demo origin").to.deep.equal([]);
+        expect(resources.filter((url) => url.pathname.startsWith("/api/") || url.pathname.startsWith("/socket.io")).map((url) => url.href),
+          "no backend or socket requests in the reading demo").to.deep.equal([]);
+      });
       cy.screenshot(`demo-${viewport.name}-discussion`, { capture: "viewport", disableTimersAndAnimations: false });
     }
   });
