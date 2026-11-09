@@ -1,303 +1,65 @@
-# Seattle Pulse Backend
+# Seattle Pulse backend
 
-A **Flask**-based backend for the **Seattle Pulse** location-based social media app, designed for **scalability** and **extensibility**. This service provides RESTful APIs, database integration, and background task handling—laying the foundation for a modern social platform to rival TikTok, Instagram, and more.
+The Flask API for Seattle Pulse's web and Flutter clients. It handles session authentication, content, neighborhood feeds, profiles, follows and discussions. SQLAlchemy stores application records in PostgreSQL; Celery and Redis support background ingestion. Flask-SocketIO supplies the messaging and notification paths.
 
----
+Publisher adapters extract headlines, source links, timestamps, descriptions and images. The saver checks for duplicates and assigns a neighborhood from each publisher's coverage area. The combined feed filters those records by location and interleaves sources; My Pulse has separate following and engagement-ranking logic. The [engineering walkthrough](../docs/ENGINEERING.md) traces these paths through the code.
 
-## Table of Contents
+The public static demo uses bundled fixtures and does not call this API.
 
-1. [Overview](#overview)  
-2. [Features](#features)  
-3. [Technology Stack](#technology-stack)  
-4. [Getting Started](#getting-started)  
-   - [Prerequisites](#prerequisites)  
-   - [Local Installation](#local-installation)  
-   - [Configuration & Environment](#configuration--environment)  
-   - [Database Migrations](#database-migrations)  
-5. [Project Structure](#project-structure)  
-6. [Running the Application](#running-the-application)  
-   - [Local Development](#local-development)  
-   - [Docker Compose](#docker-compose)  
-   - [Celery Workers](#celery-workers)  
-7. [Scripts & Utilities](#scripts--utilities)  
-8. [Contributing](#contributing)  
-   - [Branching](#branching)  
-   - [Commit Conventions](#commit-conventions)  
-   - [Pull Requests](#pull-requests)  
-9. [Testing & Quality](#testing--quality)  
-10. [Additional Resources](#additional-resources)  
-11. [License](#license)
+## Run locally
 
----
+Start Docker Desktop, then run from the repository root:
 
-## Overview
-
-The **Seattle Pulse Backend** is a Flask application providing:
-
-- **User Authentication & Profiles**  
-- **Content & Feed APIs**  
-- **Comments, Reactions, & Event Management**  
-- **Background Tasks** (via Celery) for fetching news, weather, etc.  
-- **Database Migrations** (Alembic) to keep schema up-to-date
-
-> **Note**: For the Next.js front-end, check out [Seattle Pulse Frontend](https://github.com/Seattle-Pulse/SEATTLE-PULSE-FRONTEND).
-
----
-
-## Features
-
-- **RESTful Endpoints**: Organized in `/app/api/*`, covering authentication, feed, profile, and more.  
-- **Fetchers & Tasks**: Background tasks for news/weather ingestion, leveraging **Celery** + **Redis**.  
-- **Local AWS Mock**: Optional **LocalStack** usage for S3-like storage in dev/test environments.  
-- **Rate Limiting**: Basic API rate limiting via Flask or custom logic.  
-- **Error Handling**: Centralized error handling to keep responses consistent.
-
----
-
-## Technology Stack
-
-- **Python 3.10+**  
-- **Flask** (RESTful APIs)  
-- **PostgreSQL** (Primary database)  
-- **SQLAlchemy** (ORM)  
-- **Alembic** (Database migrations)  
-- **Celery** (Asynchronous background tasks)  
-- **Redis** (Broker/Cache for Celery)  
-- **Docker & Docker Compose** (Optional for containerized dev environment)
-
----
-
-## Getting Started
-
-### Prerequisites
-
-1. **Python 3.10+**  
-2. **PostgreSQL** (Local or remote)  
-3. **Redis** (If running Celery tasks)  
-4. **Git**  
-5. (Optional) **Docker** + **Docker Compose**
-
-> **Recommended**: Use [pyenv](https://github.com/pyenv/pyenv) to manage multiple Python versions, or any standard approach (brew, apt-get, etc.).
-
-### Local Installation
-
-1. **Clone the Repo**  
-   ```bash
-   git clone https://github.com/Seattle-Pulse/SEATTLE-PULSE-BACKEND.git
-   cd SEATTLE-PULSE-BACKEND
-   ```
-
-2. **Create & Activate a Virtual Environment**  
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-3. **Install Dependencies**  
-   ```bash
-   pip install --upgrade pip
-   pip install -r requirements.txt
-   ```
-
-### Configuration & Environment
-
-Copy or create a `.env` file (ignored by Git) in the project root. Example:
-
-```bash
-# .env
-
-# Database
-POSTGRES_USER=your_db_user
-POSTGRES_PASSWORD=your_db_pass
-POSTGRES_DB=your_db_name
-DATABASE_URL=postgresql://your_db_user:your_db_pass@localhost:5432/your_db_name
-
-# Flask
-FLASK_ENV=development
-SECRET_KEY=some-random-secret
-
-# Celery
-CELERY_BROKER_URL=redis://localhost:6379/0
-CELERY_RESULT_BACKEND=redis://localhost:6379/0
-
-# AWS / LocalStack
-AWS_ACCESS_KEY_ID=test
-AWS_SECRET_ACCESS_KEY=test
-S3_ENDPOINT_URL=http://localhost:4566
+```sh
+make demo
+make smoke
 ```
 
-> **Security Reminder**: Never commit real passwords or secrets. Use a password manager or environment-specific secrets manager (e.g., AWS Secrets Manager).
+The root Compose file starts Flask, Next.js, PostgreSQL and Redis. `make demo` waits for backend health and seeds fictional content; `make smoke` checks the API, guest feed, login and session persistence. The backend is exposed at [localhost:5050](http://localhost:5050), mapped to port `5000` inside the container.
 
-### Database Migrations
+Local login: `demo@seattlepulse.local` / `DemoPass123!`.
 
-We use **Alembic** to handle schema changes.
+Useful commands from the repository root:
 
-```bash
-# Run existing migrations
-flask db upgrade
-
-# Generate a new migration script after model changes
-flask db revision --autogenerate -m "Describe changes"
+```sh
+make seed
+docker compose logs -f backend
 ```
 
----
+`make seed` can be repeated without duplicating demo rows and repairs the demo's canonical neighborhood labels. See the [local walkthrough](../docs/DEMO.md#full-local-system) for configuration and troubleshooting.
 
-## Project Structure
+The root quickstart disables live startup fetching and leaves LocalStack optional. It starts the web process; Celery worker and beat are separate deployment processes supported by [`entrypoint.py`](entrypoint.py). The repository also contains an older backend-specific Compose configuration; use the root quickstart for the documented web/API setup.
 
-```
-SEATTLE-PULSE-BACKEND/
-├── app/
-│   ├── api/
-│   │   ├── auth.py
-│   │   ├── comment.py
-│   │   ├── content.py
-│   │   ├── ...
-│   ├── fetchers/
-│   │   ├── news_fetcher.py
-│   │   ├── weather_fetcher.py
-│   ├── models.py
-│   ├── ...
-├── migrations/
-│   ├── env.py
-│   ├── versions/
-│   ├── alembic.ini
-├── scripts/
-│   ├── seed.py
-│   └── remove_all_dbs.py
-├── requirements.txt
-├── run.py
-├── docker-compose.yml
-├── Dockerfile
-└── ...
+## Configuration
+
+[`backend/.env.example`](.env.example) lists backend settings; [the root template](../.env.example) supplies Compose defaults. Python dependencies are listed in [`requirements.txt`](requirements.txt), and the Docker image uses Python 3.10.
+
+For development outside Docker, provide a reachable PostgreSQL database, install the requirements in a virtual environment, and configure the local database, session salts and frontend URLs. Container hostnames such as `db`, `redis` and `localstack` must be replaced with addresses reachable from the host. [`run.py`](run.py) starts the API on port `5000`, or the configured `PORT`.
+
+The [app factory](app/__init__.py) initializes extensions and routes. [Flask-Migrate revisions](migrations/) record schema changes. External integrations such as email, OAuth, storage and live ingestion need their own configuration; the seeded Docker walkthrough does not require those services. See [SECURITY.md](../SECURITY.md) for secret handling.
+
+## Check changes
+
+[CI](../.github/workflows/ci.yml) installs the Python requirements, compiles `app` and `tests`, and runs this regression subset against a disposable SQLite database:
+
+```sh
+python -m compileall -q app tests
+pytest -q tests/auth/test_login.py tests/content/test_get_guest_feed.py tests/content/test_demo_seed.py
 ```
 
-- **app/**: Main Flask code, including routes (`/api/`), models, config, etc.  
-- **migrations/**: Alembic scripts for DB schema changes.  
-- **scripts/**: Additional utilities (seeding DB, removing old databases).  
-- **run.py**: Entry point for running the Flask server.  
-- **docker-compose.yml**: Orchestrates local dev environment (PostgreSQL, Redis, LocalStack, etc.).
+Run these commands from `backend/` in a configured virtual environment, using the test environment from the workflow. The fixtures clear database tables, so use an isolated test database. The test harness stubs import-time OpenStreetMap downloads; these checks cover stored location labels and API behavior, not live geographic classification. Other tests live in [`tests/`](tests/); the CI subset does not establish that the entire suite passes.
 
----
+## Code map
 
-## Running the Application
+- [`app/api/`](app/api/) — authentication, content, feed, relationships, profiles and other API routes.
+- [`app/models.py`](app/models.py) — relational models.
+- [`app/fetchers/`](app/fetchers/) — publisher adapters, saving and scheduled fetches.
+- [`app/location_service.py`](app/location_service.py) — canonical location filtering.
+- [`scripts/seed_demo.py`](scripts/seed_demo.py) — deterministic local accounts, stories and discussions.
+- [`lambda-news-fetcher/`](lambda-news-fetcher/) — multi-source ingestion handler.
+- [`ecs-task-def.json`](ecs-task-def.json) — container deployment definition.
 
-### Local Development
-
-1. **Activate Virtual Env**  
-   ```bash
-   source venv/bin/activate
-   ```
-2. **Initialize DB**  
-   ```bash
-   flask db upgrade
-   ```
-3. **Run the Server**  
-   ```bash
-   python run.py
-   ```
-
-Server typically listens on [http://127.0.0.1:5001](http://127.0.0.1:5001).
-
-### Docker Compose
-
-For a complete environment with PostgreSQL, Redis, and LocalStack:
-
-```bash
-docker-compose up --build
-```
-
-- **db**: PostgreSQL container  
-- **redis**: For Celery  
-- **localstack**: AWS mock (S3, etc.)  
-- **web**: Your Flask app container  
-- **celery-worker**, **celery-beat**: For asynchronous tasks
-
-> **Pro Tip**: Inspect the `docker-compose.yml` to see how containers link together.
-
-### Celery Workers
-
-To run background tasks (e.g., news or weather fetching):
-- **Celery Worker**:  
-  ```bash
-  celery -A app.celery worker --loglevel=info
-  ```
-- **Celery Beat** (Scheduled tasks):  
-  ```bash
-  celery -A app.celery beat --loglevel=info
-  ```
-
-If using Docker Compose, these run automatically in separate containers.
-
----
-
-## Scripts & Utilities
-
-- **`create_bucket.py`**: Helps create S3 buckets on LocalStack for local dev.  
-- **`scripts/seed.py`**: Seeds the database with initial data.  
-- **`scripts/remove_all_dbs.py`**: Utility for wiping dev/test databases.  
-
-> Carefully review each script before running to avoid data loss in production.
-
----
-
-## Contributing
-
-We appreciate community input and PRs! Follow the same guidelines as our front-end repo:
-
-### Branching
-
-- **main**: Always production-ready.  
-- **feature/short-description**: New features or significant changes.  
-- **hotfix/short-description**: Urgent bug or security fixes.
-
-```bash
-git checkout -b feature/advanced-notifications
-```
-
-### Commit Conventions
-
-```
-[Fix] Resolved race condition in Celery news fetch
-
-- Replaced naive scheduling with robust approach
-- Updated unit tests
-```
-
-### Pull Requests
-
-1. **Push your branch**:
-   ```bash
-   git push origin feature/advanced-notifications
-   ```
-2. **Open a PR** on GitHub.  
-3. **Provide context** (issue link, screenshots).  
-4. **Merge** when approved.
-
----
-
-## Testing & Quality
-
-- **Python Unit Tests**: If you have a `tests/` folder, you can run them with:
-  ```bash
-  pytest
-  ```
-- **Linting/Style**: Use [Flake8](https://flake8.pycqa.org/) or [Black](https://black.readthedocs.io/en/stable/) to enforce coding standards:
-  ```bash
-  pip install flake8 black
-  black app/ --check
-  ```
-- **Integration Tests**: Could be done via scripts or frameworks like [Postman/Newman](https://learning.postman.com/docs/running-collections/using-newman-cli/) or [pytest + requests](https://docs.pytest.org/en/stable/).
-
----
-
-## Additional Resources
-
-- [Flask Documentation](https://flask.palletsprojects.com/en/latest/)  
-- [SQLAlchemy Docs](https://docs.sqlalchemy.org/en/14/)  
-- [Celery Docs](https://docs.celeryproject.org/en/stable/)  
-- [Alembic Migrations](https://alembic.sqlalchemy.org/en/latest/)  
-
----
+[Local architecture](../docs/ARCHITECTURE.md) · [Web client](../frontend/) · [Flutter client](../mobile/)
 
 ## License
 

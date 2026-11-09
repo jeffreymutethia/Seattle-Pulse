@@ -1,112 +1,97 @@
-# Demo walkthroughs
+# Running Seattle Pulse
 
-## Browsable product demo
+## Public demo
 
-The static demo opens as a guest in **All Seattle**, with eight original place
-guides covering eight areas. Choose a neighborhood, open a story, then visit
-the dedicated **Sign in** page. It reuses the original login artwork and layout.
-**Continue as demo reader** creates a local Alex Morgan session and returns to
-the feed with the selected neighborhood intact.
+The [hosted demo](https://seattle-pulse-demo.jeffreymutethia.chatgpt.site/) opens
+in **All Seattle** with eight original place guides. Choose a neighborhood and
+open a story to read its sample discussion. Guests can browse immediately.
 
-The desktop rail and mobile bottom bar link real routes:
+Choose **Sign in**, then **Continue as demo reader** to use the fictional Alex
+Morgan account. Sign-in returns to the feed with the selected neighborhood
+intact. The desktop sidebar and mobile navigation connect these routes:
 
-- `/` — The Feed: citywide guides, neighborhood filters and sample discussions.
-- `/auth/login/` — original branded sign-in, demo entry and back to browsing.
-- `/mypulse/` — guides from three initially followed fictional publishers; follow
-  and unfollow sources to change this feed locally.
-- `/profile/` — original profile header with a sample avatar, six saved guides,
-  local comments and working local profile editing.
+| Route | Interaction |
+| --- | --- |
+| `/` | Citywide feed, neighborhood filters and discussions |
+| `/auth/login/` | Demo sign-in and a return to browsing |
+| `/mypulse/` | A feed from three initially followed publishers; follow and unfollow sources |
+| `/profile/` | Six saved guides, comment activity and an editable sample profile |
 
-Guests can browse immediately. My Pulse and Profile offer the sign-in route
-when the visitor has no demo session. After signing in, add a sample comment,
-open My Pulse, unfollow Market Notes, then reload. Its guide remains absent.
-Open Profile, explore Saved guides and Your comments, edit the bio, and reload.
-Sign out to return to guest access. There are no account credentials to enter.
+Comments, follows, profile edits and the demo session persist in the current
+tab's `sessionStorage`. They do not authenticate against Flask or write to a
+server. Publisher identities, accounts, conversations and engagement are
+fictional. The guides describe real places; photography credits are available
+under **About this edition and photo credits** on The Feed.
 
-Sessions, selected neighborhood, follows, profile edits and added comments stay
-in the current browser tab's session storage. These simulate the product's
-interactions without authenticating against Flask or saving to the server.
-Publisher identities and the reader account are fictional; guides are original
-copy about real places. Existing photography is bundled with credits available
-from **About this edition and photo credits** on The Feed.
+### Run the static build
+
+Use Node 20 or 22 and Python 3:
 
 ```sh
 cd frontend
 npm ci
 npm run build:demo
-npm run test:demo
+npm run serve:demo
 ```
 
-To browse manually, run `npm run serve:demo` and open `http://localhost:3000`.
-Stop that server before `npm run test:demo`, which manages its own server. On a
-host inheriting `ELECTRON_RUN_AS_NODE`, run `env -u ELECTRON_RUN_AS_NODE npm run test:demo`.
+Open [localhost:3000](http://localhost:3000). Stop the server before running
+`npm run test:demo`, which starts its own server. If the shell inherits
+`ELECTRON_RUN_AS_NODE`, use `env -u ELECTRON_RUN_AS_NODE npm run test:demo`.
 
-See [deployment settings and verification](DEPLOYMENT.md) for Vercel access
-status, direct-route checks, screenshots and the release-blocking browser test.
-The regular build retains the API-backed product and does not enable demo mode.
+The [deployment runbook](DEPLOYMENT.md) covers hosting, direct-route checks,
+screenshots and the blocking browser test.
 
 ## Full local system
 
-The Docker quickstart below exercises the Flask API and persistent database.
-The portfolio flag is off in the normal frontend build and Docker stack.
+The Docker stack runs the API-backed web app with PostgreSQL and Redis. Demo
+mode is off, and seed data replaces live publisher fetching for this setup.
 
-### 1) Start the stack
-```bash
+### Start the stack
+
+With Docker Desktop running, execute from the repository root:
+
+```sh
 make demo
 ```
 
-This starts frontend, backend, Postgres, and Redis, waits for backend health, and seeds deterministic demo data.
+This builds and starts the services, waits for backend health, and seeds the
+database. Open [localhost:3000](http://localhost:3000); the API is exposed at
+[localhost:5050](http://localhost:5050).
 
-Demo credentials:
-- Email: `demo@seattlepulse.local`
-- Password: `DemoPass123!`
+The guest feed is populated immediately. Sign in with
+`demo@seattlepulse.local` / `DemoPass123!`, then reload to check the server-backed
+session. These credentials belong to the local seed and are separate from the
+hosted demo's password-free session.
 
-## 2) 2-Minute User Script
-1. Open `http://localhost:3000`.
-2. Point out that the guest feed loads immediately (seeded local data).
-3. Log in with the demo credentials.
-4. Refresh the page and show session-backed state persists.
-5. If needed, mention that auth verification is backed by `/api/v1/auth/is_authenticated`.
-6. Optional terminal proof: run `make smoke`.
+### Check the API and session
 
-## 3) Smoke Validation
-```bash
+```sh
 make smoke
 ```
 
-Expected output (PASS lines):
-```text
-PASS: /healthz returned 200
-PASS: guest_feed returned 200 with success payload
-PASS: login returned 200 with success payload
-PASS: authenticated session confirmed
-PASS: frontend returned 200
-Smoke test completed successfully.
-```
+The script checks `/healthz`, the guest feed, login, authenticated session and
+the frontend. Each successful check prints `PASS`.
 
-## 4) Optional Logs During Demo
-```bash
-make logs
-```
+### Logs and seed maintenance
 
-## 5) Reset / Recover Fast
-```bash
-make down
-make demo
-```
+`make logs` follows service logs. `make seed` adds missing demo rows and repairs
+their canonical neighborhood labels without duplicating posts.
 
-## 6) Optional Quality Checks
-```bash
-make lint
-make test
-```
+To stop the services while keeping database data, run `docker compose down`.
+`make down` also removes the stack's volumes and local database; use it only
+when resetting the data is intended.
 
-## Common Failure Modes
-- `make demo` fails immediately:
-  - Ensure Docker Desktop is running.
-- Backend not reachable on `5050`:
-  - Check host port conflicts, then rerun `make demo`.
-- Login fails due to protocol mismatch:
-  - Verify `NEXT_PUBLIC_API_BASE_URL=http://localhost:5050/api/v1`.
-- UI data seems stale:
-  - Run `make seed`.
+### Troubleshooting
+
+| Symptom | Check |
+| --- | --- |
+| Stack fails to start | Confirm Docker Desktop is running; inspect `docker compose ps` and `make logs`. |
+| Backend is unreachable on port 5050 | Check for a host port conflict and inspect backend logs. |
+| Browser login or API calls fail | Use `NEXT_PUBLIC_API_BASE_URL=http://localhost:5050/api/v1`; Docker's `backend:5000` address is for server-side calls. |
+| Seeded feed data is missing or has old labels | Run `make seed`. |
+
+Configuration defaults are in [`.env.example`](../.env.example),
+[`backend/.env.example`](../backend/.env.example) and
+[`frontend/.env.example`](../frontend/.env.example). See
+[architecture](ARCHITECTURE.md) for service boundaries and
+[deployment and checks](DEPLOYMENT.md) for verification scope.

@@ -1,88 +1,118 @@
-# Product demo verification and deployment
+# Demo deployment
 
-## Release status
+The public demo is a static Next.js export at
+[seattle-pulse-demo.jeffreymutethia.chatgpt.site](https://seattle-pulse-demo.jeffreymutethia.chatgpt.site/).
+It contains four routes: `/`, `/auth/login/`, `/mypulse/` and `/profile/`.
+Reader sessions, follows, comments and profile edits stay in the browser tab's
+`sessionStorage`. The demo needs no Flask server, database or application secrets.
 
-The expanded product is delivered in [PR #1](https://github.com/jeffreymutethia/Seattle-Pulse/pull/1), on `feat/portfolio-demo`.
+The regular frontend build and [Docker quickstart](../README.md#run-locally)
+use the API-backed application. See [the engineering walkthrough](ENGINEERING.md)
+for the differences between the two builds.
 
-**Account-based Vercel deployment needs login.** Plugin discovery found Vercel available but not connected, and CLI `65.12.1` reported **Logged out**. Its dry-run inspection required login, but the actual `deploy --temporary` command successfully published the static export anonymously. The time-limited preview is **https://rapid-rowan-xw1wfsb.tmp.now**, deployment `dpl_6eHWvW43hnz6JXVV2Ebpe1LZR6cp`, expiring **November 9, 2026 at 14:22 UTC**. It is an expiring review URL, not a lasting portfolio address.
+## Build and verify
 
-The README's stable public URL and GitHub About link still point to the existing citywide Site. The account owner can deploy a lasting Vercel project with the settings below; no private claim URL or credential is stored in this repository.
+Use Node 20 or 22 and Python 3:
 
-The source was reconciled with the live citywide edition before this work. PR head `fb39b42` lacked it. The supplied `seattle-pulse-citywide.bundle` was not present in the accessible filesystem, so the connected Site's version-3 source (`b33049162a260ac58c7d15a47266cdc94536979c`) was recovered instead. Its citywide delta was applied to the latest PR, preserving the PR's backend, documentation and regression work. Commit `2afde20` records that reconciliation. All nine imported WebP files are byte-identical to the recovered source, and the original guide copy, further-reading links and photography credits are preserved.
+```sh
+cd frontend
+npm ci
+npm run build:demo
+npm run test:demo
+```
+
+The browser test starts its own local server. To test a deployment instead:
+
+```sh
+CYPRESS_BASE_URL=https://seattle-pulse-demo.jeffreymutethia.chatgpt.site npm run test:demo:preview
+```
+
+If the host sets `ELECTRON_RUN_AS_NODE`, prefix the test command with
+`env -u ELECTRON_RUN_AS_NODE`.
+
+The blocking [Cypress journey](../frontend/cypress/e2e/demo-walkthrough.cy.ts)
+runs in Chrome at 1440 × 1000 and 390 × 844 with fresh guest storage. It covers:
+
+- The feed-first layout, eight areas, neighborhood filtering and discussions.
+- Branded sign-in, returning to the selected neighborhood and adding a comment.
+- The Feed, My Pulse and Profile, active navigation and direct route loading.
+- Follow/unfollow, saved guides, comment activity, profile editing and reloads.
+- Sign-out, loaded images, no API or socket requests and no WebSocket connections.
+
+Application errors fail the test. It does not stub API responses. Mobile checks
+use a Chrome viewport; they do not cover physical devices or Safari.
+
+## Verified release
+
+On **November 9, 2026**, Site version **4** was published from application commit
+[`e0d14de`](https://github.com/jeffreymutethia/Seattle-Pulse/commit/e0d14de36dbc085b5f6eaf2a368ac001d0a6da3a).
+The public browser journey passed **1/1 in 31 seconds** across both viewport
+sizes. All four direct routes returned HTTP 200. Images loaded, the first story
+title was visible immediately, and no backend, socket or external application
+resource requests were observed.
+
+The ten screenshots in [`screenshots/product/`](screenshots/product/) were
+refreshed from that deployment and visually reviewed. They show the feed,
+sign-in, My Pulse, Profile and discussion at both viewport sizes.
+
+[CI](https://github.com/jeffreymutethia/Seattle-Pulse/actions/workflows/ci.yml)
+builds the static demo and regular frontend, runs the browser journey, and checks
+the backend test subset. Repository-wide frontend lint remains advisory because
+of existing lint debt. Backend tests stub startup geographic downloads; Docker
+configuration validation is separate from a full stack startup and smoke test.
+
+## Publish to the existing Site
+
+[`.openai/hosting.json`](../.openai/hosting.json) identifies the public Site and
+serves the root `out/` directory. The root build runs `frontend`'s `build:demo`
+and copies its export to `out/`.
+
+Sites has a 32 MiB source-object limit. The repository history contains larger
+full-app media, so [`prepare-demo-source.mjs`](../scripts/prepare-demo-source.mjs)
+creates a clean snapshot of the committed demo build inputs without rewriting
+GitHub history:
+
+```sh
+node scripts/prepare-demo-source.mjs /absolute/path/to/empty-directory
+```
+
+Run this from a clean checkout. Publish the snapshot through the Sites source
+workflow, preserving the existing project ID and public audience. Its
+`SOURCE_REVISION.json` records the originating GitHub commit. Build and package
+the snapshot, deploy it, then run the browser journey against the public URL.
 
 ## Deploy on Vercel
 
-The account owner needs to approve `vercel login`, or connect the Vercel integration. Then create or link a Vercel project for `jeffreymutethia/Seattle-Pulse` using these settings:
+The same export can be deployed to Vercel. Account login or a connected Vercel
+integration is required for a lasting deployment; neither is configured in this
+workspace. The existing public Site remains the live address.
+
+Create or link a project for `jeffreymutethia/Seattle-Pulse` with these settings:
 
 | Setting | Value |
 | --- | --- |
 | Root Directory | `frontend` |
-| Framework Preset | **Other** (`framework: null`) |
+| Framework Preset | Other |
 | Node.js | `22.x` |
 | Install Command | `CYPRESS_INSTALL_BINARY=0 npm ci` |
 | Build Command | `npm run build:demo` |
 | Output Directory | `demo/out` |
-| Application environment variables | None required |
-| Initial branch to deploy | `feat/portfolio-demo` |
+| Application environment variables | None |
 
-[`frontend/vercel.json`](../frontend/vercel.json) already declares the install, build and output settings. The static export contains real HTML entry points for `/`, `/auth/login/`, `/mypulse/` and `/profile/`. It does not need serverless functions, Flask, a database or the Next.js server preset. See Vercel's [configuration reference](https://vercel.com/docs/project-configuration/vercel-json).
-
-For CLI deployment, run from the repository root because the linked project
-uses `frontend` as its Root Directory. This follows Vercel's
-[monorepo CLI guidance](https://vercel.com/docs/monorepos):
+[`frontend/vercel.json`](../frontend/vercel.json) declares the install, build and
+output settings. For CLI deployment, run from the repository root because the
+project's Root Directory is `frontend`:
 
 ```sh
-git switch feat/portfolio-demo
 npx vercel login
 npx vercel link
 npx vercel deploy
 ```
 
-Approve the login in your own browser, select the intended account/project, and use the settings above. Deploy the feature branch for the preview; after merge, use `main` for future production updates. Do not enter provider/API secrets for this static demo.
-
-For recruiter access, make this demo deployment publicly reachable without Vercel authentication, using the project's Deployment Protection settings or a preview-domain exception. Verify in a fresh browser before publishing its link. [Vercel deployment protection](https://vercel.com/docs/deployment-protection) controls hosting access independently of the demo's simulated reader session.
-
-After Vercel returns a URL:
-
-```sh
-cd frontend
-CYPRESS_BASE_URL=https://YOUR-VERIFIED-DEPLOYMENT.vercel.app npm run test:demo:preview
-```
-
-On a host that inherits `ELECTRON_RUN_AS_NODE`, prefix with `env -u ELECTRON_RUN_AS_NODE`. Also check the four direct URLs and confirm an HTTP 200. Only after this passes, update the README/GitHub About public link to the lasting deployment and refresh the screenshots from that deployment.
-
-## Verified release
-
-The local production-export journey passed **1/1** at both viewport sizes. The same full journey also passed **1/1 in 17 seconds** against the temporary public Vercel URL, with no API responses mocked. The regular Next.js production build, static export, full TypeScript check, focused lint of demo modules, Docker Compose configuration and backend syntax compilation also passed.
-
-The anonymous preview publishes only the already-built `frontend/demo/out` directory using `vercel deploy --temporary --yes --json --cwd demo/out`. It does not establish an account-linked Vercel project. The checked-in `frontend/vercel.json` is the starting configuration for the lasting account-based deployment described above.
-
-The browser test runs against the production static export, locally and at the temporary public Vercel preview, using Chrome at **1440 × 1000** and **390 × 844**, each starting with fresh guest storage. Application errors are test failures. The single blocking journey covers:
-
-- The original feed-first layout: navigation, neighborhood selector and story cards, with the first story title visible immediately on desktop and mobile.
-- All Seattle with eight areas and eight distinct, consistently reused publisher images.
-- Neighborhood filtering, changed stories, guide details and sample discussion.
-- The original sign-in artwork, guest back-to-browsing path, and Continue as demo reader.
-- Selected neighborhood retained through sign-in; added local comments retained across routes.
-- The Feed, My Pulse and Profile, with one active navigation destination.
-- Seeded follows, unfollow/reload/refollow, saved guides, comment activity and profile edit/reload.
-- Direct URLs, signed-in reloads, sign-out and signed-out profile entry.
-- Loaded images, same-origin application resources, no `/api/` or `/socket.io` requests, and zero WebSocket constructions.
-
-There are no API response stubs. A pass-through observer records WebSocket constructions without mocking them; ResourceTiming checks fetches and loaded resources. The test disables Cypress screenshot timer-freezing to avoid a React 19 scheduling issue and never suppresses application exceptions.
-
-[Current PR checks](https://github.com/jeffreymutethia/Seattle-Pulse/pull/1/checks) include the blocking demo browser job, the normal frontend production build and the backend subset. The regular API build remains separate from `frontend/demo/`.
-
-### Screenshots
-
-The ten expanded-product screenshots in [`screenshots/product/`](screenshots/product/) are captured from the **verified temporary Vercel preview** of the production export. Each screen has desktop and mobile captures: feed, branded sign-in, My Pulse, Profile and discussion. Previous public walkthrough captures remain in `screenshots/demo/` as historical evidence.
-
-## Implementation boundaries
-
-[`DemoSessionBoundary`](../frontend/app/demo/demo-session.tsx) is enabled only by the static demo build. Its state lives in this tab's `sessionStorage`: simulated sign-in, followed publisher IDs, comments and profile fields. Existing `feedLocation` storage preserves neighborhood selection. No personal credentials are collected or sent. Guests can read The Feed immediately; signed-in destinations offer the dedicated sign-in route to guests.
-
-The normal frontend still uses the original login, API services, navigation, settings, messaging and story-upload flows. The ProfileHeader's local edit callback and hidden-share option are optional and retain their original defaults. The Docker quickstart and backend API are preserved. See [the engineering walkthrough](ENGINEERING.md) and [Run locally](../README.md#run-locally).
-
-The remaining original destinations were reviewed: uploads, notifications, messages, account settings and location maps depend on APIs, uploads or map services. They are omitted from demo navigation instead of exposing unfinished interactions. The local profile editor supports the Profile screen's primary action.
-
-Repository-wide frontend lint has existing debt and remains advisory in CI. Focused demo lint, TypeScript and both production builds are checked separately. The mobile checks use a Chrome viewport, not physical hardware or Safari. The backend test harness stubs import-time geographic downloads; those tests do not verify live geographic classification. Docker configuration is validated separately from full-stack startup/smoke.
+See Vercel's [monorepo CLI guidance](https://vercel.com/docs/monorepos). Use
+`feat/portfolio-demo` until the PR is merged, then `main` for production. Make the
+deployment publicly accessible in
+[Deployment Protection](https://vercel.com/docs/deployment-protection), test the
+returned URL with the command above, and check all four direct routes. Update
+both the README and GitHub About link only after verification, and capture
+screenshots from that deployment.

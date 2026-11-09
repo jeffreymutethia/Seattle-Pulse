@@ -126,7 +126,7 @@ To add new tests:
 
 For additional guidance, see the [Cypress documentation](https://docs.cypress.io/).
 
-## Portfolio demo release check
+## Static demo browser check
 
 The dedicated spec uses the exported application and its bundled fixtures with
 no API stubs. One blocking journey runs in fresh desktop (1440 × 1000) and mobile
@@ -143,10 +143,10 @@ npm run build:demo
 npm run test:demo
 ```
 
-Run the exact same check against a deployed preview:
+Run the same check against a deployment:
 
 ```sh
-CYPRESS_BASE_URL=https://your-verified-preview.example npm run test:demo:preview
+CYPRESS_BASE_URL=https://seattle-pulse-demo.jeffreymutethia.chatgpt.site npm run test:demo:preview
 ```
 
 The browser configuration uses installed Google Chrome. If this host inherits
