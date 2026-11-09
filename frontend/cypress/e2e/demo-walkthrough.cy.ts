@@ -52,6 +52,14 @@ describe("Portfolio walkthrough", () => {
         cy.wrap($card).should("contain.text", "Ballard, Seattle");
       });
 
+      cy.reload();
+      cy.get('[aria-label="Choose neighborhood"]').should("contain.text", "Ballard");
+      cy.contains('[data-cy="post-card"]', ballardStory).should("be.visible");
+      cy.contains('[data-cy="post-card"]', capitolHillStory).should("not.exist");
+      cy.get('[data-cy="post-card"]').each(($card) => {
+        cy.wrap($card).should("contain.text", "Ballard, Seattle");
+      });
+
       cy.contains('[data-cy="post-card"]', ballardStory)
         .find('[data-cy="open-discussion"]')
         .click();

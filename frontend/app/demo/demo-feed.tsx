@@ -17,6 +17,10 @@ export function DemoFeed() {
   };
   const noop = () => {};
 
+  // Static HTML and hydration must agree before the saved neighborhood loads.
+  // The shared hook may restore Ballard from sessionStorage on a return visit.
+  if (loading) return <p role="status" className="p-8 text-sm text-gray-600">Loading neighborhood…</p>;
+
   return (
     <div className="mx-auto w-full max-w-5xl p-4 md:px-8 md:py-6">
       <NavBar title="Your neighborhood, in focus" location={location} onLocationChange={handleLocationChange}
