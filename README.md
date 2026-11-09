@@ -4,7 +4,7 @@ Citywide feeds bury the stories that matter a few blocks away. Seattle Pulse bri
 
 **[Live citywide edition](https://seattle-pulse-demo.jeffreymutethia.chatgpt.site/)** · **[Browsable product update — PR #1](https://github.com/jeffreymutethia/Seattle-Pulse/pull/1)** · [Engineering walkthrough](docs/ENGINEERING.md) · [Verification and Vercel setup](docs/DEPLOYMENT.md)
 
-The expanded product has a [temporary Vercel preview](https://sonic-comet-ybiyy18.tmp.now), expiring **November 9, 2026 at 13:17 UTC**. A lasting Vercel deployment requires account login, so the stable public link above still opens the earlier citywide edition. [Deploy the expanded build](docs/DEPLOYMENT.md#deploy-on-vercel) with the checked-in settings; replace the stable link after verifying that deployment.
+The expanded product has a [temporary Vercel preview](https://rapid-rowan-xw1wfsb.tmp.now), expiring **November 9, 2026 at 14:22 UTC**. A lasting Vercel deployment requires account login, so the stable public link above still opens the earlier citywide edition. [Deploy the expanded build](docs/DEPLOYMENT.md#deploy-on-vercel) with the checked-in settings; replace the stable link after verifying that deployment.
 
 <img src="docs/screenshots/product/desktop-feed.png" alt="Seattle Pulse citywide feed with the original product navigation and neighborhood selector" width="900">
 

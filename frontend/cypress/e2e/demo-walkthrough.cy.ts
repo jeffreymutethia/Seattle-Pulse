@@ -94,6 +94,14 @@ describe("Browsable portfolio product", () => {
       activeDestination("The Feed", /^\/$/);
       cy.get('[aria-label="Choose neighborhood"]').should("contain.text", "All Seattle");
       cy.get('[data-cy="post-card"]').should("have.length", 8);
+      cy.get('[aria-label="About this demo"]').should("not.exist");
+      cy.contains("Seattle, block by block.").should("not.exist");
+      cy.get('[data-cy="post-card"]').first().find('[data-cy="open-discussion"]')
+        .should("be.visible").and(($title) => {
+          const bounds = $title[0].getBoundingClientRect();
+          expect(bounds.top, "first story starts in the initial viewport").to.be.at.least(0);
+          expect(bounds.bottom, "first story title fits above the fold").to.be.at.most(viewport.height);
+        });
       cy.get('[data-cy="post-card"]').then(($cards) => {
         const areas = $cards.toArray().map(card => card.textContent?.match(/(?:Downtown|Capitol Hill|Ballard|U District|Wallingford|West Seattle|Queen Anne|Seward Park), Seattle/)?.[0]);
         expect(new Set(areas).size, "eight distinct Seattle areas").to.equal(8);

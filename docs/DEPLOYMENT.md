@@ -4,7 +4,7 @@
 
 The expanded product is delivered in [PR #1](https://github.com/jeffreymutethia/Seattle-Pulse/pull/1), on `feat/portfolio-demo`.
 
-**Account-based Vercel deployment needs login.** Plugin discovery found Vercel available but not connected, and CLI `65.12.1` reported **Logged out**. Its dry-run inspection required login, but the actual `deploy --temporary` command successfully published the static export anonymously. The time-limited preview is **https://sonic-comet-ybiyy18.tmp.now**, deployment `dpl_9kVMwCn7evigDuJ66dG8oks6JBjL`, expiring **November 9, 2026 at 13:17 UTC**. It is an expiring review URL, not a lasting portfolio address.
+**Account-based Vercel deployment needs login.** Plugin discovery found Vercel available but not connected, and CLI `65.12.1` reported **Logged out**. Its dry-run inspection required login, but the actual `deploy --temporary` command successfully published the static export anonymously. The time-limited preview is **https://rapid-rowan-xw1wfsb.tmp.now**, deployment `dpl_6eHWvW43hnz6JXVV2Ebpe1LZR6cp`, expiring **November 9, 2026 at 14:22 UTC**. It is an expiring review URL, not a lasting portfolio address.
 
 The README's stable public URL and GitHub About link still point to the existing citywide Site. The account owner can deploy a lasting Vercel project with the settings below; no private claim URL or credential is stored in this repository.
 
@@ -53,12 +53,13 @@ On a host that inherits `ELECTRON_RUN_AS_NODE`, prefix with `env -u ELECTRON_RUN
 
 ## Verified release
 
-The local production-export journey passed **1/1** at both viewport sizes. The same full journey also passed **1/1 in 14.8 seconds** against the temporary public Vercel URL, with no API responses mocked. The regular Next.js production build, static export, full TypeScript check, focused lint of demo modules, Docker Compose configuration and backend syntax compilation also passed.
+The local production-export journey passed **1/1** at both viewport sizes. The same full journey also passed **1/1 in 17 seconds** against the temporary public Vercel URL, with no API responses mocked. The regular Next.js production build, static export, full TypeScript check, focused lint of demo modules, Docker Compose configuration and backend syntax compilation also passed.
 
 The anonymous preview publishes only the already-built `frontend/demo/out` directory using `vercel deploy --temporary --yes --json --cwd demo/out`. It does not establish an account-linked Vercel project. The checked-in `frontend/vercel.json` is the starting configuration for the lasting account-based deployment described above.
 
 The browser test runs against the production static export, locally and at the temporary public Vercel preview, using Chrome at **1440 × 1000** and **390 × 844**, each starting with fresh guest storage. Application errors are test failures. The single blocking journey covers:
 
+- The original feed-first layout: navigation, neighborhood selector and story cards, with the first story title visible immediately on desktop and mobile.
 - All Seattle with eight areas and eight distinct, consistently reused publisher images.
 - Neighborhood filtering, changed stories, guide details and sample discussion.
 - The original sign-in artwork, guest back-to-browsing path, and Continue as demo reader.
