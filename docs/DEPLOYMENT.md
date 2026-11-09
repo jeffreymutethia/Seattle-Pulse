@@ -1,7 +1,7 @@
 # Demo deployment
 
 The public demo is a static Next.js export at
-[seattle-pulse-demo.jeffreymutethia.chatgpt.site](https://seattle-pulse-demo.jeffreymutethia.chatgpt.site/).
+[seattle-pulse-demo.vercel.app](https://seattle-pulse-demo.vercel.app/).
 It contains four routes: `/`, `/auth/login/`, `/mypulse/` and `/profile/`.
 Reader sessions, follows, comments and profile edits stay in the browser tab's
 `sessionStorage`. The demo needs no Flask server, database or application secrets.
@@ -24,7 +24,7 @@ npm run test:demo
 The browser test starts its own local server. To test a deployment instead:
 
 ```sh
-CYPRESS_BASE_URL=https://seattle-pulse-demo.jeffreymutethia.chatgpt.site npm run test:demo:preview
+CYPRESS_BASE_URL=https://seattle-pulse-demo.vercel.app npm run test:demo:preview
 ```
 
 If the host sets `ELECTRON_RUN_AS_NODE`, prefix the test command with
@@ -44,9 +44,10 @@ use a Chrome viewport; they do not cover physical devices or Safari.
 
 ## Verified release
 
-On **November 9, 2026**, Site version **4** was published from application commit
-[`e0d14de`](https://github.com/jeffreymutethia/Seattle-Pulse/commit/e0d14de36dbc085b5f6eaf2a368ac001d0a6da3a).
-The public browser journey passed **1/1 in 31 seconds** across both viewport
+On **November 9, 2026**, the [Vercel production deployment](https://vercel.com/jt254/seattle-pulse-demo/9qFEeKYo6xX99QMy1MBNkH3nTzZv)
+was published from application commit
+[`8d1f008`](https://github.com/jeffreymutethia/Seattle-Pulse/commit/8d1f0086acff09fe124b81a061a31b43513be08a).
+The public browser journey passed **1/1 in 17 seconds** across both viewport
 sizes. All four direct routes returned HTTP 200. Images loaded, the first story
 title was visible immediately, and no backend, socket or external application
 resource requests were observed.
@@ -61,34 +62,14 @@ the backend test subset. Repository-wide frontend lint remains advisory because
 of existing lint debt. Backend tests stub startup geographic downloads; Docker
 configuration validation is separate from a full stack startup and smoke test.
 
-## Publish to the existing Site
-
-[`.openai/hosting.json`](../.openai/hosting.json) identifies the public Site and
-serves the root `out/` directory. The root build runs `frontend`'s `build:demo`
-and copies its export to `out/`.
-
-Sites has a 32 MiB source-object limit. The repository history contains larger
-full-app media, so [`prepare-demo-source.mjs`](../scripts/prepare-demo-source.mjs)
-creates a clean snapshot of the committed demo build inputs without rewriting
-GitHub history:
-
-```sh
-node scripts/prepare-demo-source.mjs /absolute/path/to/empty-directory
-```
-
-Run this from a clean checkout. Publish the snapshot through the Sites source
-workflow, preserving the existing project ID and public audience. Its
-`SOURCE_REVISION.json` records the originating GitHub commit. Build and package
-the snapshot, deploy it, then run the browser journey against the public URL.
-
 ## Vercel configuration
 
 The `seattle-pulse-demo` project in the `jt254` account is connected to
 `jeffreymutethia/Seattle-Pulse`. It tracks `main` for production and creates
-previews for other branches. The existing public Site remains the live address
-until the Vercel build passes its public browser checks.
+previews for other branches. The production domain is publicly accessible;
+preview deployments retain Vercel authentication.
 
-Create or link a project for `jeffreymutethia/Seattle-Pulse` with these settings:
+The project uses these settings:
 
 | Setting | Value |
 | --- | --- |
@@ -112,14 +93,39 @@ For CLI deployment, run from the repository root:
 
 ```sh
 npx vercel login
-npx vercel link
+npx vercel link --project seattle-pulse-demo --scope jt254
 npx vercel deploy
 ```
 
 See Vercel's [monorepo CLI guidance](https://vercel.com/docs/monorepos). Use
-`feat/portfolio-demo` until the PR is merged, then `main` for production. Make the
-deployment publicly accessible in
-[Deployment Protection](https://vercel.com/docs/deployment-protection), test the
-returned URL with the command above, and check all four direct routes. Update
-both the README and GitHub About link only after verification, and capture
-screenshots from that deployment.
+`feat/portfolio-demo` until the PR is merged. `vercel deploy` creates a preview;
+`vercel deploy --prod` publishes to the production domain. After merge, pushes
+to `main` deploy automatically.
+
+Keep the production domain public in
+[Deployment Protection](https://vercel.com/docs/deployment-protection). Test a
+release with the browser command above and check all four direct routes before
+updating public links or screenshots.
+
+## Alternate Sites deployment
+
+The [existing public Site](https://seattle-pulse-demo.jeffreymutethia.chatgpt.site/)
+also serves this version of the application.
+
+[`.openai/hosting.json`](../.openai/hosting.json) identifies the public Site and
+serves the root `out/` directory. The root build runs `frontend`'s `build:demo`
+and copies its export to `out/`.
+
+Sites has a 32 MiB source-object limit. The repository history contains larger
+full-app media, so [`prepare-demo-source.mjs`](../scripts/prepare-demo-source.mjs)
+creates a clean snapshot of the committed demo build inputs without rewriting
+GitHub history:
+
+```sh
+node scripts/prepare-demo-source.mjs /absolute/path/to/empty-directory
+```
+
+Run this from a clean checkout. Publish the snapshot through the Sites source
+workflow, preserving the existing project ID and public audience. Its
+`SOURCE_REVISION.json` records the originating GitHub commit. Build and package
+the snapshot, deploy it, then run the browser journey against the public URL.

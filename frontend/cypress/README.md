@@ -146,7 +146,7 @@ npm run test:demo
 Run the same check against a deployment:
 
 ```sh
-CYPRESS_BASE_URL=https://seattle-pulse-demo.jeffreymutethia.chatgpt.site npm run test:demo:preview
+CYPRESS_BASE_URL=https://seattle-pulse-demo.vercel.app npm run test:demo:preview
 ```
 
 The browser configuration uses installed Google Chrome. If this host inherits

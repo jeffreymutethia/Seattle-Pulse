@@ -4,7 +4,7 @@ Local coverage is spread across citywide outlets and neighborhood blogs. Seattle
 
 The project includes a Next.js web app, Flask API, Flutter client, and deployment infrastructure. The public demo uses the web app's screens with eight original Seattle guides and browser-local interactions. The API-backed application and ingestion pipeline are available in the same repository.
 
-**[Live demo](https://seattle-pulse-demo.jeffreymutethia.chatgpt.site/)** · [Engineering walkthrough](docs/ENGINEERING.md) · [Architecture](docs/ARCHITECTURE.md) · [CI](https://github.com/jeffreymutethia/Seattle-Pulse/actions/workflows/ci.yml)
+**[Live demo](https://seattle-pulse-demo.vercel.app/)** · [Engineering walkthrough](docs/ENGINEERING.md) · [Architecture](docs/ARCHITECTURE.md) · [CI](https://github.com/jeffreymutethia/Seattle-Pulse/actions/workflows/ci.yml)
 
 <img src="docs/screenshots/product/desktop-feed.png" alt="Seattle Pulse citywide feed with the original product navigation and neighborhood selector" width="900">
 

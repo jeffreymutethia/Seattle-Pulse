@@ -2,7 +2,7 @@
 
 ## Public demo
 
-The [hosted demo](https://seattle-pulse-demo.jeffreymutethia.chatgpt.site/) opens
+The [hosted demo](https://seattle-pulse-demo.vercel.app/) opens
 in **All Seattle** with eight original place guides. Choose a neighborhood and
 open a story to read its sample discussion. Guests can browse immediately.
 
