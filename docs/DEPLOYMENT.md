@@ -81,27 +81,34 @@ workflow, preserving the existing project ID and public audience. Its
 `SOURCE_REVISION.json` records the originating GitHub commit. Build and package
 the snapshot, deploy it, then run the browser journey against the public URL.
 
-## Deploy on Vercel
+## Vercel configuration
 
-The same export can be deployed to Vercel. Account login or a connected Vercel
-integration is required for a lasting deployment; neither is configured in this
-workspace. The existing public Site remains the live address.
+The `seattle-pulse-demo` project in the `jt254` account is connected to
+`jeffreymutethia/Seattle-Pulse`. It tracks `main` for production and creates
+previews for other branches. The existing public Site remains the live address
+until the Vercel build passes its public browser checks.
 
 Create or link a project for `jeffreymutethia/Seattle-Pulse` with these settings:
 
 | Setting | Value |
 | --- | --- |
-| Root Directory | `frontend` |
+| Root Directory | `frontend/demo` |
 | Framework Preset | Other |
 | Node.js | `22.x` |
-| Install Command | `CYPRESS_INSTALL_BINARY=0 npm ci` |
-| Build Command | `npm run build:demo` |
-| Output Directory | `demo/out` |
+| Install Command | `CYPRESS_INSTALL_BINARY=0 npm --prefix .. ci` |
+| Build Command | `npm --prefix .. run build:demo` |
+| Output Directory | `out` |
+| Include source files outside Root Directory | Enabled |
 | Application environment variables | None |
 
-[`frontend/vercel.json`](../frontend/vercel.json) declares the install, build and
-output settings. For CLI deployment, run from the repository root because the
-project's Root Directory is `frontend`:
+[`frontend/demo/vercel.json`](../frontend/demo/vercel.json) declares the install,
+build and output settings. Using the demo directory as the project root keeps
+the full app's `frontend/middleware.ts` out of the static deployment. Shared UI
+and dependencies remain in the parent `frontend` directory, enabled by
+[Vercel's outside-root source setting](https://vercel.com/docs/monorepos/monorepo-faq).
+The regular API-backed build keeps its middleware.
+
+For CLI deployment, run from the repository root:
 
 ```sh
 npx vercel login
