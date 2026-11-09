@@ -6,8 +6,8 @@ Verified on **November 9, 2026**, at the public, account-free URL:
 
 **https://seattle-pulse-demo.jeffreymutethia.chatgpt.site/**
 
-The connected Sites integration reported deployment success for version **1**
-(`appgdep_6af1a5a9bdec8191ac4ad1000a4f845d`). An independent HTTP request returned
+The connected Sites integration reported deployment success for version **2**
+(`appgdep_6af1a7433ebc81919e38d4e830383056`). An independent HTTP request returned
 200, and the blocking Cypress journey passed against this public URL in fresh
 Chrome guest sessions at **1440 × 1000** and **390 × 844**.
 
@@ -15,8 +15,9 @@ The journey verifies:
 
 1. The first feed contains Capitol Hill stories and decoded bundled images.
 2. Selecting **Ballard, Seattle** replaces the story set and removes Capitol Hill stories.
-3. Opening the Ballard market story displays its title, illustration and actual seeded discussion.
-4. Resource URLs stay on the demo origin, with no `/api/` or `/socket.io` requests.
+3. Reloading preserves Ballard and its stories without a hydration exception.
+4. Opening the Ballard market story displays its title, illustration and actual seeded discussion.
+5. Resource URLs stay on the demo origin, with no `/api/` or `/socket.io` requests.
 
 The one spec runs the complete journey at both sizes, without API interception
 or fixture injection by the test. It passed **1/1** against the public release.
@@ -35,9 +36,9 @@ this is not a physical-device or Safari test.
 ## Build and hosting boundary
 
 The public application was built from GitHub application revision
-[`0e24647`](https://github.com/jeffreymutethia/Seattle-Pulse/commit/0e24647).
+[`cfa417c`](https://github.com/jeffreymutethia/Seattle-Pulse/commit/cfa417c).
 Later portfolio documentation and test-harness edits do not change its runtime.
-The Sites source snapshot is `e80b52e5f4ff02c47990b9e8fdce04d36340e356` and records
+The Sites source snapshot is `23d2625a9c07e812ca0b4e5a96d605642754c0e8` and records
 the GitHub revision in `SOURCE_REVISION.json`.
 
 The existing GitHub history contains a 41 MiB full-app background image, exceeding
@@ -56,8 +57,11 @@ npm --prefix frontend ci
 npm run build
 ```
 
-Use an empty destination. The connected Sites source workflow commits and pushes
-that snapshot, builds/packages `out/`, saves the matching version and publishes
+Use an empty destination for snapshot generation. On subsequent releases, open
+the existing Sites source checkout with the integration first, then refresh its
+build inputs from the generated snapshot while preserving its `.git` history.
+The connected Sites source workflow commits and pushes those inputs,
+builds/packages `out/`, saves the matching version and publishes
 it to the public project. No API, publisher, map, database or analytics credential
 is required by the deployed application. Keep source-write credentials in the
 integration session, never in repository files.
@@ -82,6 +86,9 @@ capture disables Cypress's timer freezing to avoid a React 19 scheduling error;
 application exceptions remain test failures.
 
 ## Checks and limits
+
+[Current PR checks](https://github.com/jeffreymutethia/Seattle-Pulse/pull/1/checks)
+track the blocking frontend build, backend subset and demo browser job.
 
 Completed locally:
 

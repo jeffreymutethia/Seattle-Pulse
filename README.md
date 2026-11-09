@@ -53,7 +53,7 @@ npm run typecheck
 npm run build
 ```
 
-The release-blocking browser test covers both desktop and mobile sizes, verifies that switching neighborhoods replaces the story set, opens the seeded discussion, and checks that resources stay on the demo’s origin. CI also builds the regular frontend and runs backend authentication, guest-feed and canonical-location regression tests. Repository-wide lint still has existing debt; see [verification details](docs/DEPLOYMENT.md#checks-and-limits).
+The release-blocking browser test covers both desktop and mobile sizes, verifies that switching neighborhoods replaces the story set, preserves the selection on reload, opens the seeded discussion, and checks that resources stay on the demo’s origin. CI also builds the regular frontend and runs backend authentication, guest-feed and canonical-location regression tests. Repository-wide lint still has existing debt; see [verification details](docs/DEPLOYMENT.md#checks-and-limits).
 
 ## Inspect the implementation
 
