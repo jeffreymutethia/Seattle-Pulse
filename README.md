@@ -1,103 +1,69 @@
 # Seattle Pulse
-[![CI](https://github.com/jeffreymutethia/Seattle-Pulse/actions/workflows/ci.yml/badge.svg)](https://github.com/jeffreymutethia/Seattle-Pulse/actions/workflows/ci.yml)
 
-Seattle Pulse is a neighborhood discovery and conversation platform. This monorepo ships a deterministic local demo (seeded data + smoke checks) so reviewers can run and validate the core product flow quickly without third-party keys.
+Local coverage is spread across citywide outlets and neighborhood blogs. Seattle Pulse brings those stories and neighborhood conversations into one feed: browse across Seattle, narrow the feed to an area, or follow sources to build a personal My Pulse feed.
 
-## Core Features
-- Guest feed browsing with location-aware content
-- Email/password authentication with session-based login state
-- Seeded demo account and deterministic sample posts for reliable demos
-- Web UI flows for feed, navigation, and comment interactions
-- One-command local stack with API, web app, Postgres, and Redis
+The project includes a Next.js web app, Flask API, Flutter client, and deployment infrastructure. The public demo uses the web app's screens with eight original Seattle guides and browser-local interactions. The API-backed application and ingestion pipeline are available in the same repository.
 
-## Tech Stack
-- Backend: Python, Flask, SQLAlchemy, Celery
-- Frontend: Next.js (React, TypeScript)
-- Data: PostgreSQL, Redis
-- Infra/Dev: Docker Compose, Makefile
-- Mobile: Flutter (optional)
+**[Live demo](https://seattle-pulse-demo.vercel.app/)** · [Engineering walkthrough](docs/ENGINEERING.md) · [Architecture](docs/ARCHITECTURE.md) · [CI](https://github.com/jeffreymutethia/Seattle-Pulse/actions/workflows/ci.yml)
 
-## Architecture Snapshot
-```text
-Browser (localhost:3000)
-  | \
-  |  \ client-side API calls
-  |   -> localhost:5050 (host port mapped to backend container port 5000)
-  |
-  v
-Frontend container (Next.js :3000)
-  \ server-side API calls over compose network
-   -> backend:5000
+<img src="docs/screenshots/product/desktop-feed.png" alt="Seattle Pulse citywide feed with the original product navigation and neighborhood selector" width="900">
 
-Backend container (Flask :5000) <-> Postgres
-            |
-            +--------------------> Redis
-```
+Production capture, November 9, 2026. [Mobile feed](docs/screenshots/product/mobile-feed.png) · [Sign-in](docs/screenshots/product/desktop-sign-in.png) · [My Pulse](docs/screenshots/product/desktop-my-pulse.png) · [Profile](docs/screenshots/product/desktop-profile.png) · [Deployment and verification](docs/DEPLOYMENT.md)
 
-Runtime split (important):
-- Browser code calls `http://localhost:5050/api/v1`.
-- Next.js server-side code running inside the frontend container calls `http://backend:5000/api/v1`.
-- The browser never calls `http://backend:5000` directly.
+## Explore the demo
 
-Deeper system detail: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+1. Open **The Feed** in **All Seattle**. Filter to a neighborhood and open a story's sample discussion.
+2. Choose **Sign in**, then **Continue as demo reader**. You return to the same neighborhood, with no password or account setup.
+3. Open **My Pulse** to see guides from three followed sources. Follow or unfollow a source to change the feed, then explore **Profile**, its saved guides, local comments and editable bio.
 
-## Quickstart
-Prereqs: Docker Desktop is required. `make` is recommended. Alternative: `docker compose up --build`.
+The desktop sidebar and mobile navigation connect refreshable routes. Comments, follows and profile edits persist in the current browser tab's session storage.
 
-```bash
+The publishers, reader account, conversations and engagement are fictional. The guides describe real places, with bundled Seattle photography, credits and further-reading links. The static demo needs no backend or service credentials.
+
+## How it works
+
+Publisher adapters extract local headlines, links, timestamps, descriptions and images. A shared saver checks URLs and headline similarity for duplicates, associates each story with a publisher, and assigns a neighborhood from the publisher's coverage area. Flask, SQLAlchemy and PostgreSQL provide the API and persistence.
+
+The combined feed filters by neighborhood, queries matching stories newest-first, then interleaves sources before pagination. The backend's separate My Pulse feed selects followed authors and orders by engagement with time decay.
+
+The static build supplies typed fixtures at [`postServices.ts`](frontend/app/services/postServices.ts) and [`contentService.ts`](frontend/app/services/contentService.ts). It reuses the feed, location selector, cards, discussions, navigation and profile header; the demo sign-in adapts the original login screen. Its My Pulse filters fixtures by followed source without running the backend ranking. The [engineering walkthrough](docs/ENGINEERING.md) traces both paths.
+
+## Run locally
+
+For the full stack, start Docker Desktop and run:
+
+```sh
 make demo
 ```
 
-Demo credentials:
-- Email: `demo@seattlepulse.local`
-- Password: `DemoPass123!`
+This builds Next.js and Flask, starts PostgreSQL and Redis, waits for the API, and seeds deterministic fictional posts. Open [localhost:3000](http://localhost:3000). The API is at [localhost:5050](http://localhost:5050); browser calls use that address, while server-side calls use Docker's `backend:5000`.
 
-Demo URLs:
-- Web: `http://localhost:3000`
-- API: `http://localhost:5050`
-- Health: `http://localhost:5050/healthz`
+Local login: `demo@seattlepulse.local` / `DemoPass123!`. Run `make smoke` to check health, the guest feed, login and session persistence. `make seed` repairs seeded neighborhood labels without duplicating posts. [Local setup and troubleshooting](docs/DEMO.md#full-local-system)
 
-## 60-Second Demo Flow
-1. Open `http://localhost:3000`.
-2. Show guest feed content loading.
-3. Log in with the demo credentials.
-4. Refresh and confirm session-backed state still works.
-5. Optional terminal proof: run `make smoke`.
+For the static product demo, use Node 20 or 22 and Python 3:
 
-Scripted walkthrough: [`docs/DEMO.md`](docs/DEMO.md)
-
-## Troubleshooting
-- Port conflict on `3000` or `5050`: stop the conflicting process, then rerun `make demo`.
-- Stack stale/unhealthy: run `make down`, then `make demo`.
-- Login fails with SSL/protocol errors: verify `NEXT_PUBLIC_API_BASE_URL=http://localhost:5050/api/v1`.
-- Data looks stale: run `make seed`.
-- Need fast end-to-end checks: run `make smoke`.
-- Need service logs: run `make logs`.
-- Best-effort quality checks: run `make lint` and `make test`.
-
-## Repo Structure
-```text
-.
-├── backend/                # Flask API, models, templates, scripts
-├── frontend/               # Next.js web app
-├── mobile/                 # Flutter app (optional)
-├── docs/
-│   ├── DEMO.md
-│   └── ARCHITECTURE.md
-├── docker-compose.yml      # Root demo stack
-├── Makefile                # dev/demo/seed/smoke/down/logs/test/lint
-├── SECURITY.md
-└── .env.example
+```sh
+cd frontend
+npm ci
+npm run build:demo
+npm run serve:demo
 ```
 
-## Mobile (Optional)
-`mobile/` is included for completeness but is not required for the main web/API demo.
-Use a locally installed Flutter SDK (see [`mobile/README.md`](mobile/README.md)); do not vendor Flutter SDK source inside this repo.
+Open [localhost:3000](http://localhost:3000). Direct routes are `/`, `/auth/login/`, `/mypulse/` and `/profile/`. Stop the server before running the browser check:
 
-## Security & Secrets
-- Never commit real secrets or tokens.
-- Configure local values from:
-  - [`.env.example`](.env.example)
-  - [`backend/.env.example`](backend/.env.example)
-  - [`frontend/.env.example`](frontend/.env.example)
-- See [`SECURITY.md`](SECURITY.md) for disclosure and rotation policy.
+```sh
+npm run test:demo
+npm run typecheck
+npm run build
+```
+
+The blocking browser test covers the desktop and mobile journey, including neighborhood changes, sign-in, discussions, follows, profile edits, direct routes and reloads. It also checks image loading and the absence of backend or socket requests. CI builds the regular frontend and runs backend regression tests; repository-wide frontend lint remains advisory. See the [verification runbook](docs/DEPLOYMENT.md).
+
+## Inspect the implementation
+
+- [`frontend/`](frontend/) — Next.js, React, TypeScript, Tailwind and Radix; static routes in `frontend/demo/`, shared demo state and screens in `frontend/app/demo/`.
+- [`backend/`](backend/) — Flask, SQLAlchemy, Celery, publisher adapters, Lambda and ECS definitions.
+- [`mobile/`](mobile/) — Flutter client; optional for the Docker web/API quickstart. See its [setup notes](mobile/README.md).
+- [`docker-compose.yml`](docker-compose.yml) and [`Makefile`](Makefile) — local stack, seeding and smoke checks.
+
+Configure local values from [`.env.example`](.env.example), [`backend/.env.example`](backend/.env.example) and [`frontend/.env.example`](frontend/.env.example). See [SECURITY.md](SECURITY.md) for disclosure and secret handling.

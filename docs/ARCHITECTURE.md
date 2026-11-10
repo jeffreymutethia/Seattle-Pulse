@@ -1,80 +1,101 @@
 # Architecture
 
-## Monorepo Layout
-- `frontend/`: Next.js app (UI, client/server API execution)
-- `backend/`: Flask API (auth, feed/content APIs, seed scripts)
-- `mobile/`: Flutter app (optional for the core demo)
-- Root `docker-compose.yml` + `Makefile`: local orchestration
+Seattle Pulse has two web builds: a static public demo and the API-backed
+application. They share UI components and content types, with a build-time
+flag selecting fixture services for the demo.
 
-## Local Demo Topology
+## Repository layout
+
+| Path | Responsibility |
+| --- | --- |
+| [`frontend/`](../frontend/) | Next.js web app, API services and shared interface |
+| [`frontend/demo/`](../frontend/demo/) | Static demo routes and export configuration |
+| [`frontend/app/demo/`](../frontend/app/demo/) | Fixtures, browser-local session and demo screens |
+| [`backend/`](../backend/) | Flask API, database models, publisher ingestion and deployment definitions |
+| [`mobile/`](../mobile/) | Flutter client for the Flask API |
+| [`docker-compose.yml`](../docker-compose.yml) | Local Next.js, Flask, PostgreSQL and Redis services |
+
+## Static demo
+
 ```mermaid
 flowchart LR
-    B[Browser<br/>localhost:3000] -->|HTTP| F[Frontend Container<br/>Next.js :3000]
-    B -->|Client API calls<br/>localhost:5050/api/v1| K[Backend Container<br/>Flask :5000]
-    F -->|Server-side API calls<br/>backend:5000/api/v1| K
-    K <--> P[(Postgres)]
+    H[Static host] -->|HTML, JavaScript and bundled assets| B[Browser]
+    B --> F[Typed story and discussion fixtures]
+    B <--> S[Tab sessionStorage<br/>reader, follows, comments, profile, location]
+```
+
+`NEXT_PUBLIC_DEMO_MODE=true` enables the demo service boundary. The static
+export contains `/`, `/auth/login/`, `/mypulse/` and `/profile/` as HTML entry
+points. No Flask service, database or socket connection is required. Signing
+in selects a fictional reader locally; it does not create a server session.
+
+## Local API-backed application
+
+```mermaid
+flowchart LR
+    B[Browser<br/>localhost:3000] -->|HTTP| F[Next.js container<br/>:3000]
+    B -->|Client API calls<br/>localhost:5050/api/v1| K[Flask container<br/>:5000]
+    F -->|Server API calls<br/>backend:5000/api/v1| K
+    K <--> P[(PostgreSQL)]
     K <--> R[(Redis)]
 ```
 
-Port semantics:
-- `localhost:5050` is the host port mapped to backend container port `5000`.
-- `backend:5000` is reachable only from other containers on the compose network.
-- Browsers use `localhost` endpoints, not compose service DNS names.
+`make demo` builds the services and seeds the database. Next.js renders the
+interface, Flask handles authentication and content APIs, PostgreSQL stores
+application data, and Redis supplies the configured Celery broker and result backend.
+The root stack runs the backend web process; Celery worker and beat processes
+have separate entrypoint commands and deployment definitions.
 
-## Why Two API Base URLs Exist
-- `NEXT_PUBLIC_API_BASE_URL`:
-  - Used by browser-executed code.
-  - Must resolve from the host machine/browser, so local demo uses `http://localhost:5050/api/v1`.
-- `INTERNAL_API_BASE_URL`:
-  - Used by server-side Next.js execution inside the frontend container.
-  - Resolves over Docker DNS, so local demo uses `http://backend:5000/api/v1`.
+The two API base URLs serve different execution environments:
 
-This split prevents browser networking failures while keeping server-side calls inside the Docker network.
+| Variable | Used by | Local value |
+| --- | --- | --- |
+| `NEXT_PUBLIC_API_BASE_URL` | Browser code | `http://localhost:5050/api/v1` |
+| `INTERNAL_API_BASE_URL` | Next.js server code inside Docker | `http://backend:5000/api/v1` |
 
-## Login Flow (Session Cookie)
+Host port `5050` maps to container port `5000`. The browser uses the host
+address; only containers on the Compose network can resolve `backend`.
+
+## Server login
+
 ```mermaid
 sequenceDiagram
-    participant U as User Browser
-    participant FE as Frontend (localhost:3000)
-    participant BE as Backend (localhost:5050 -> container:5000)
-    participant DB as Postgres
+    participant B as Browser
+    participant FE as Next.js
+    participant API as Flask
+    participant DB as PostgreSQL
 
-    U->>FE: Open login page
-    FE-->>U: Render login UI
-    U->>BE: POST /api/v1/auth/login
-    BE->>DB: Verify credentials
-    DB-->>BE: User + password hash result
-    BE-->>U: 200 + Set-Cookie (session)
-    U->>BE: GET /api/v1/auth/is_authenticated (cookie attached)
-    BE-->>U: 200 {"authenticated": true}
+    B->>FE: Open login page
+    FE-->>B: Render login form
+    B->>API: POST /api/v1/auth/login
+    API->>DB: Verify credentials
+    DB-->>API: User and password hash
+    API-->>B: Set session cookie
+    B->>API: GET /api/v1/auth/is_authenticated with cookie
+    API-->>B: authenticated: true
 ```
 
-## Service Responsibilities
-- Frontend:
-  - Renders UI and navigation.
-  - Executes both browser and server-side API calls using environment-specific base URLs.
-- Backend:
-  - Handles auth/session and feed/content endpoints.
-  - Persists relational data and uses Redis-backed async plumbing where configured.
-- Postgres:
-  - Primary application database.
-- Redis:
-  - Broker/cache support for async and near-realtime workloads.
+This server-backed flow is separate from **Continue as demo reader** in the
+static build.
 
-## Demo Reliability
-- Single-command startup: `make demo`
-- Deterministic seed data: `make seed`
-- Scripted smoke checks: `make smoke`
+## Ingestion and mobile
 
-## Configuration Model
-- Root defaults: [`.env.example`](../.env.example)
-- Backend defaults: [`../backend/.env.example`](../backend/.env.example)
-- Frontend defaults: [`../frontend/.env.example`](../frontend/.env.example)
-- Secrets policy: [`../SECURITY.md`](../SECURITY.md)
+Publisher adapters parse source content into `UserContent` records. Shared
+saving logic checks duplicates and attaches publisher coverage labels. The
+combined feed filters those labels and interleaves sources; the My Pulse query
+selects followed authors and applies engagement with time decay. See the
+[engineering walkthrough](ENGINEERING.md) for the code paths and tradeoffs.
 
-## Optional Mobile Track
-`mobile/` stays intentionally optional and is not required for the web/API portfolio demo.
+The Flutter app uses the Flask API independently of Next.js. It is optional for
+the Docker quickstart and has its own API base URL configuration.
 
-## Related Docs
-- Quickstart: [`../README.md`](../README.md)
-- Demo script: [`DEMO.md`](DEMO.md)
+## Configuration and checks
+
+Defaults are documented in [`.env.example`](../.env.example),
+[`backend/.env.example`](../backend/.env.example) and
+[`frontend/.env.example`](../frontend/.env.example). See
+[SECURITY.md](../SECURITY.md) for secret handling.
+
+[Local setup](DEMO.md) covers startup, seed maintenance and smoke checks.
+[Deployment and verification](DEPLOYMENT.md) records hosting settings and the
+scope of automated checks.

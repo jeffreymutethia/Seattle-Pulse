@@ -15,13 +15,23 @@ with open("/tmp/client_secret.json", "w") as f:
 
 # Patch Google's OAuth flow to avoid parsing the dummy secrets file
 import google_auth_oauthlib.flow
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 google_auth_oauthlib.flow.Flow.from_client_secrets_file = MagicMock(
     return_value=MagicMock(authorization_url=lambda: ("", ""))
 )
 
-from app import create_app, db  # Import app factory method
+# App utilities preload remote OSM boundary data. Keep test startup independent
+# of Nominatim/Overpass; geography tests supply their own mocked boundaries.
+# These patches are scoped to import, leaving production behavior unchanged.
+with (
+    patch("osmnx.geocode_to_gdf", side_effect=RuntimeError("Offline test fixture")),
+    patch(
+        "osmnx.features.features_from_place",
+        side_effect=RuntimeError("Offline test fixture"),
+    ),
+):
+    from app import create_app, db  # Import app factory method
 
 
 @pytest.fixture

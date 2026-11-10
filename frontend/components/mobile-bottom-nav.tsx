@@ -7,8 +7,14 @@ import { Bell, Plus, User } from "lucide-react";
 import { useAuth } from "@/app/context/auth-context";
 import { AuthPopup } from "@/components/auth/auth-popup";
 import Image from "next/image";
+import { IS_DEMO } from "@/lib/demo";
+import { DemoMobileNavigation } from "@/app/demo/demo-navigation";
 
 export function MobileBottomNav() {
+  return IS_DEMO ? <DemoMobileNavigation /> : <LiveMobileBottomNav />;
+}
+
+function LiveMobileBottomNav() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, isAuthenticated } = useAuth();

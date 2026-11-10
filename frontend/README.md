@@ -1,248 +1,62 @@
-# Seattle Pulse Frontend
+# Seattle Pulse web app
 
-A modern, **location-based social media** front-end built with **Next.js** to deliver high-performance, friendly experiences. This repository stands on its own, focusing exclusively on the **web client**—making it easy for new contributors to get started without extra baggage.
+The Next.js client for Seattle Pulse: neighborhood feeds, story discussions, followed sources and profiles. It uses React, TypeScript, Tailwind and Radix components.
 
----
+The repository supports two builds:
 
-## Table of Contents
+| Build | Data and state | Entry point |
+| --- | --- | --- |
+| API-backed app | Flask API, database records and server sessions | `app/` |
+| Public demo | Bundled guides, photographs and browser-local interactions | `demo/app/` |
 
-1. [Overview](#overview)  
-2. [Features](#features)  
-3. [Technology Stack](#technology-stack)  
-4. [Getting Started](#getting-started)  
-   - [Prerequisites](#prerequisites)  
-   - [Installation](#installation)  
-   - [Running the App](#running-the-app)  
-5. [Environment Variables](#environment-variables)  
-6. [Project Structure](#project-structure)  
-7. [Contributing](#contributing)  
-   - [Branching](#branching)  
-   - [Commit Conventions](#commit-conventions)  
-   - [Pull Requests](#pull-requests)  
-8. [Testing](#testing)  
-9. [Docker (Optional)](#docker-optional)  
-10. [Additional Resources](#additional-resources)  
-11. [License](#license)  
+The demo shares the existing cards, discussions, navigation and profile components. It supplies fixtures through the service layer and keeps reader state in the current tab's `sessionStorage`. The regular build retains API authentication and persistence. See the [engineering walkthrough](../docs/ENGINEERING.md) for that boundary.
 
----
+## Run locally
 
-## Overview
+For the full stack, start Docker Desktop and run `make demo` from the repository root. This starts the web app, Flask, PostgreSQL and Redis, then seeds local data. Open [localhost:3000](http://localhost:3000). The [local walkthrough](../docs/DEMO.md#full-local-system) covers login and smoke checks.
 
-**Seattle Pulse Frontend** is the user-facing component of a location-based social network. It allows users to:
-- Explore local content in real time.
-- Engage with community-driven feeds and events.
-- Manage personal profiles, follow others, and share multimedia posts.
+To run the static demo alone, use Node 20 or 22 and Python 3:
 
-> **Note**: For backend functionality (API, database, etc.), refer to the [Seattle Pulse Backend](https://github.com/Seattle-Pulse/SEATTLE-PULSE-BACKEND).
+```sh
+cd frontend
+npm ci
+npm run build:demo
+npm run serve:demo
+```
 
----
+No application credentials are needed. Open [localhost:3000](http://localhost:3000); the exported routes are `/`, `/auth/login/`, `/mypulse/` and `/profile/`.
 
-## Features
-
-- **Location-Aware Feeds**: Discover trending stories and posts in Seattle neighborhoods.  
-- **Real-Time Engagement**: See up-to-date content thanks to Next.js dynamic features.  
-- **User Profiles & Follows**: Manage your public profile, follow friends or influencers, and view curated feeds.  
-- **Responsive Design**: Built with mobile-first principles, ensuring a fast experience across devices.
-
----
-
-## Technology Stack
-
-- **Framework**: [Next.js](https://nextjs.org/) (React-based, supports SSR & static generation)  
-- **Language**: TypeScript (for type safety and maintainability)  
-- **Styling**: CSS modules, Tailwind, or other CSS frameworks (depending on your preference)  
-- **State Management**: React hooks, context APIs, or Redux (optional)  
-- **HTTP Client**: `fetch` or Axios to interact with the Seattle Pulse API  
-- **Version Control**: Git + GitHub  
-
----
-
-## Getting Started
-
-### Prerequisites
-
-- **Node.js** (version 16 or higher recommended)  
-- **npm** (or **yarn**, if you prefer)  
-- **Git**  
-
-> **Recommended**: Use [nvm](https://github.com/nvm-sh/nvm) to manage Node versions seamlessly.
-
-### Installation
-
-1. **Clone the Repo**  
-   ```bash
-   git clone https://github.com/Seattle-Pulse/SEATTLE-PULSE-FRONTEND.git
-   cd SEATTLE-PULSE-FRONTEND
-   ```
-
-2. **Install Dependencies**  
-
-    ```bash
-    npm install
-    ```
-
-or
-
-    ```bash
-    yarn
-    ```
-
-### Running the App
-
-1. **Development Server**  
-   ```bash
-   npm run dev
-   ```
-   This starts a local Next.js server at [http://localhost:3000](http://localhost:3000).
-
-2. **Production Build**  
-   ```bash
-   npm run build
-   npm run start
-   ```
-   Compiles the project for production, then launches on the default port `3000`.
-
----
-
-## Environment Variables
-
-To configure API endpoints or other secrets, create a file named `.env.local` (ignored by Git) in the project root. Example:
+For API-backed development outside Docker, run `npm run dev` with the backend available. Start with [`.env.example`](.env.example) in a local `.env.local` file. The template's `backend:5000` internal URLs resolve inside Docker; when Next.js runs on the host, set both internal URLs to the backend's host address:
 
 ```dotenv
-# Example: FRONTEND .env.local
-
-# The base URL for Seattle Pulse API
-NEXT_PUBLIC_API_BASE_URL=http://localhost:5050/api/v1
-INTERNAL_API_BASE_URL=http://backend:5000/api/v1
-INTERNAL_API_URL_NOTIFICATION=http://backend:5000
-NEXT_PUBLIC_API_URL_NOTIFICATION=http://localhost:5050
+INTERNAL_API_BASE_URL=http://localhost:5050/api/v1
+INTERNAL_API_URL_NOTIFICATION=http://localhost:5050
 ```
 
-- **NEXT_PUBLIC_API_BASE_URL**: Base URL for backend API endpoints.
-- **NEXT_PUBLIC_API_URL_NOTIFICATION**: Base URL for notification/socket and non-`/api/v1` endpoints.
-- Add or remove variables as needed for maps, analytics, etc.
+Browser requests use `NEXT_PUBLIC_API_BASE_URL` and `NEXT_PUBLIC_API_URL_NOTIFICATION`. Keep `NEXT_PUBLIC_APP_ENV=local` for local API development. [Configuration details](../docs/ARCHITECTURE.md)
 
-> **Important**: Never commit secrets or private tokens to the repo. Use `.env.local` or a secure manager like Vault / AWS Secrets Manager in production.
+## Check changes
 
----
+From `frontend/`, after building the demo:
 
-## Project Structure
-
-Simplified layout may look like this:
-
-```ruby
-SEATTLE-PULSE-FRONTEND/
-├── app/
-│   ├── page.tsx           # Home or main feed page
-│   ├── profile/           # User profile routes
-│   ├── auth/              # Auth-related pages (login, signup, reset)
-│   ├── services/          # API calls or utility wrappers
-│   ├── ...                # Other pages/routes
-├── components/
-│   ├── nav-bar.tsx
-│   ├── sidebar.tsx
-│   ├── ui/                # Reusable UI components (buttons, modals, etc.)
-├── public/                # Static assets (images, icons, etc.)
-├── styles/                # Global or shared styles (if not using Tailwind)
-├── .gitignore
-├── package.json
-├── README.md
-├── next.config.js
-├── tsconfig.json
-└── ...
+```sh
+npm run test:demo
+npm run typecheck
+npm run build
 ```
 
-- **app/**: Next.js routes + core logic.  
-- **components/**: Reusable UI components (nav bars, modals).  
-- **public/**: Images, icons, or other static files.
+The demo test manages its own local server; stop `serve:demo` first. It requires Chrome and checks fresh desktop and mobile viewports through browsing, sign-in, My Pulse and Profile. To check a deployed build, set `CYPRESS_BASE_URL` and run `npm run test:demo:preview`. If the shell inherits `ELECTRON_RUN_AS_NODE`, unset it before launching Cypress.
 
----
+`npm run lint` reports repository-wide lint findings. Existing lint debt and the legacy Cypress suite are advisory in [CI](../.github/workflows/ci.yml); the demo walkthrough and production builds are blocking. See [deployment and verification](../docs/DEPLOYMENT.md) for the release evidence and hosting configuration.
 
-## Contributing
+## Code map
 
-### Branching
-
-- **main**: Always stable and deployable.  
-- **feature/short-description**: For new features or enhancements.  
-- **hotfix/short-description**: For urgent production fixes.
-
-```bash
-git checkout -b alias/my-awesome-feature
-```
-
-### Commit Conventions
-
-Use meaningful commit messages:
-
-```
-[Feature] Implement story posting UI
-
-- Added new form for story submissions
-- Integrated with /api/content endpoint
-```
-
-### Pull Requests
-
-1. **Push your branch**:
-   ```bash
-   git push origin alias/my-awesome-feature
-   ```
-2. **Open a PR** on GitHub against `main`.  
-3. **Tag reviewers** and provide any context or screenshots.  
-4. **Merge** once approved and checks pass.
-
----
-
-## Testing
-
-This project uses **Cypress** for end-to-end tests. Run all tests with:
-
-```bash
-npm run test
-```
-
-Feel free to add Jest or React Testing Library if you need unit tests.
-
-> **Best Practice**: Keep test files alongside components (e.g., `my-component.test.tsx`).
-
----
-
-## Docker (Optional)
-
-If you prefer containerized development, here's a simple `Dockerfile` example:
-
-```dockerfile
-# Dockerfile
-
-FROM node:18-alpine
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-RUN npm install
-
-COPY . .
-EXPOSE 3000
-CMD ["npm", "run", "dev"]
-```
-
-Build and run:
-
-```bash
-docker build -t seattle-pulse-frontend .
-docker run -p 3000:3000 seattle-pulse-frontend
-```
-
-> **Note**: This is a **standalone** container for the frontend. For a full-stack local dev, see the backend’s docker-compose or an infra repo.
-
----
-
-## Additional Resources
-
-- [Next.js Documentation](https://nextjs.org/docs)
-- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
-- [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
-
----
+- [`app/services/`](app/services/) — API calls and demo fixture selection at the service boundary.
+- [`app/demo/`](app/demo/) — demo screens, fixtures and session state.
+- [`components/`](components/) — shared cards, navigation, discussions and UI controls.
+- [`demo/`](demo/) — static-export routes and configuration; output is generated in `demo/out/`.
+- [`public/`](public/) — bundled images, fonts and branding.
+- [`cypress/e2e/demo-walkthrough.cy.ts`](cypress/e2e/demo-walkthrough.cy.ts) — the blocking product journey.
 
 ## License
 

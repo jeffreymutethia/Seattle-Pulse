@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Post, ExtendedPost } from "@/app/types/content";
 import { apiClient } from "../api/api-client";
+import { IS_DEMO } from "@/lib/demo";
+import { fetchDemoPosts } from "@/app/demo/fixtures";
 
 interface PostsResponse {
   status: string;
@@ -21,6 +23,7 @@ interface ReactionResponse {
 
 export const postService = {
   async fetchPosts(page: number, location?: string): Promise<ExtendedPost[]> {
+    if (IS_DEMO) return fetchDemoPosts(page, location);
     try {
       // Build query parameters
       const params = new URLSearchParams({

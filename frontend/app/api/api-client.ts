@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { API_BASE_URL } from "@/lib/config";
+import { IS_DEMO } from "@/lib/demo";
 
 export const apiClient = {
   async request<T>(
@@ -8,6 +9,7 @@ export const apiClient = {
     method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE" = "GET",
     data?: any
   ): Promise<T> {
+    if (IS_DEMO) throw new Error("This action is available in the full local system.");
     const url = `${API_BASE_URL}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
     
     const options: RequestInit = {

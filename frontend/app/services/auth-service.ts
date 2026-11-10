@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { apiClient } from "../api/api-client";
+import { IS_DEMO } from "@/lib/demo";
 import { ChangePasswordReqRequest } from "../types/auth";
 
 export interface AuthResponse {
@@ -86,6 +87,7 @@ export const authService = {
     isAuthenticated: boolean;
     user: User | null;
   }> {
+    if (IS_DEMO) return { isAuthenticated: false, user: null };
     try {
       const response = await apiClient.get<AuthResponse>(
         "/auth/is_authenticated"

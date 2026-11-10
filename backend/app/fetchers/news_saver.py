@@ -13,8 +13,8 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 LOCATION_MAP = {
-    "My Ballard":       "Ballard",
-    "Capitol Hill Seattle": "Capitol Hill",
+    "My Ballard":       "Ballard, Seattle",
+    "Capitol Hill Seattle": "Capitol Hill, Seattle",
     "The Stranger":     "Seattle",
     "The Needling":     "Seattle",
     "Komo News":        "Seattle",

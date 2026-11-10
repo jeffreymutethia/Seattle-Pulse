@@ -1,4 +1,6 @@
 import { apiClient } from "@/app/api/api-client";
+import { IS_DEMO } from "@/lib/demo";
+import { fetchDemoContent } from "@/app/demo/fixtures";
 
 interface ContentDetailResponse {
   data: any;
@@ -6,6 +8,7 @@ interface ContentDetailResponse {
 
 class ContentService {
     async fetchContentDetails(contentType: string, contentId: string | number) {
+        if (IS_DEMO) return fetchDemoContent(contentId);
         try {
           const endpoint = `/content/${contentType}/${contentId}`;
           const response = await apiClient.get<ContentDetailResponse>(endpoint);

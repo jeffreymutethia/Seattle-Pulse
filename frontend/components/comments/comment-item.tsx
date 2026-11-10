@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { IS_DEMO } from "@/lib/demo"
 import { useRouter } from "next/navigation"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -32,6 +33,7 @@ export default function CommentItem({ comment, contentId, contentType, onUpdateC
   const [hasNext, setHasNext] = useState(false)
 
   const goToProfile = () => {
+    if (IS_DEMO) return;
     router.push(`/profile/${comment.user.username}`)
   }
 
@@ -94,7 +96,7 @@ export default function CommentItem({ comment, contentId, contentType, onUpdateC
 
   return (
     <div className="flex gap-2">
-      <div onClick={goToProfile} className="cursor-pointer">
+      <div onClick={goToProfile} className={IS_DEMO ? "" : "cursor-pointer"}>
         <Avatar className="h-10 w-10 flex-shrink-0">
           <AvatarImage src={comment.user.profile_picture_url || "/placeholder.svg"} />
           <AvatarFallback>U</AvatarFallback>
@@ -124,7 +126,7 @@ export default function CommentItem({ comment, contentId, contentType, onUpdateC
           </div>
         ) : (
           <>
-            <p onClick={goToProfile} className="text-sm font-semibold cursor-pointer">
+            <p onClick={goToProfile} className={`text-sm font-semibold ${IS_DEMO ? "" : "cursor-pointer"}`}>
               {comment.user.username}
             </p>
             {comment.replied_to && (
@@ -136,7 +138,7 @@ export default function CommentItem({ comment, contentId, contentType, onUpdateC
           </>
         )}
 
-        <CommentActions
+        {!IS_DEMO && <CommentActions
           comment={comment}
           contentId={contentId}
           contentType={contentType}
@@ -149,7 +151,7 @@ export default function CommentItem({ comment, contentId, contentType, onUpdateC
           }}
           onEdit={() => setEditMode(true)}
           onUpdateComment={handleChildUpdate}
-        />
+        />}
 
         {comment.top_reactions.length > 0 && (
           <div className="flex items-center mt-1 ml-2">

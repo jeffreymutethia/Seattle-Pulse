@@ -1,0 +1,7 @@
+{
+  "name": "seattle-pulse-portfolio",
+  "private": true,
+  "scripts": {
+    "build": "npm --prefix frontend run build:demo && node scripts/prepare-demo-hosting.mjs"
+  }
+}

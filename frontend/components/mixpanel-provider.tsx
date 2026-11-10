@@ -4,11 +4,13 @@ import { useEffect } from "react";
 import { initMixpanel, storeUTMParams, loadStoredUTMParams, identifyUser } from "@/lib/mixpanel";
 import { useAuth } from "@/app/context/auth-context";
 import mixpanel from "mixpanel-browser";
+import { IS_DEMO } from "@/lib/demo";
 
 export function MixpanelProvider({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
+    if (IS_DEMO) return;
     // Initialize Mixpanel
     initMixpanel();
     
@@ -31,6 +33,7 @@ export function MixpanelProvider({ children }: { children: React.ReactNode }) {
 
   // Identify user when authenticated
   useEffect(() => {
+    if (IS_DEMO) return;
     if (isAuthenticated) {
       // Try to get user ID from user object or sessionStorage
       let userId: number | string | null = null;

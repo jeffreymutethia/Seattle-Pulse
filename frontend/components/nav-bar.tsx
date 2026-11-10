@@ -22,6 +22,8 @@ import { AuthPopup } from "./auth/auth-popup";
 import Image from "next/image";
 import { apiClient } from "@/app/api/api-client";
 import { FULL_LOGO_SRC } from "@/lib/brand-assets";
+import { IS_DEMO } from "@/lib/demo";
+import { demoNeighborhoods } from "@/app/demo/fixtures";
 
 // Dynamic import outside component to prevent re-creation
 const SearchWithResults = dynamic(() => import("./search-component"), {
@@ -32,9 +34,9 @@ const SearchWithResults = dynamic(() => import("./search-component"), {
 // Hard-coded launch set as per specifications
 const defaultNeighborhoods = [
   { name: "Seattle", value: "Seattle" },
-  { name: "Capitol Hill", value: "Capitol Hill" },
-  { name: "Ballard", value: "Ballard" },
-  { name: "U District", value: "U District" },
+  { name: "Capitol Hill, Seattle", value: "Capitol Hill, Seattle" },
+  { name: "Ballard, Seattle", value: "Ballard, Seattle" },
+  { name: "U District, Seattle", value: "U District, Seattle" },
   { name: "Outside Seattle", value: "Outside Seattle" },
 ];
 
@@ -134,12 +136,8 @@ const NavBar = ({
       : null;
     const locationToUse = savedLocation || location;
     
-    // For display, show a readable version of the location
-    // If it's a long location string, show just the main part (first part before comma)
-    // But keep the full string for API calls
-    const displayName = locationToUse.includes(',') 
-      ? locationToUse.split(',')[0].trim() 
-      : locationToUse;
+    // Keep the canonical label visible so the selected location matches the feed query.
+    const displayName = locationToUse;
     setSelectedNeighborhood(displayName);
   }, [location]);
 
@@ -151,6 +149,10 @@ const NavBar = ({
   // Handle search functionality for location selector
   const handleLocationSearch = (term: string) => {
     setSearchTerm(term);
+    if (IS_DEMO) {
+      setSearchResults(demoNeighborhoods.filter(item => item.name.toLowerCase().includes(term.trim().toLowerCase())).map(item => ({ value: item.value, label: item.name })));
+      return;
+    }
     if (term.trim()) {
       loadOptions(term.trim(), (options) => {
         setSearchResults(Array.isArray(options) ? options : []);
@@ -201,7 +203,7 @@ const NavBar = ({
       <div className="hidden md:grid grid-cols-3 items-center mb-4">
         {/* Left: Title */}
         <div className="flex items-center">
-          <h1 className="text-2xl font-bold text-black">{title}</h1>
+          <h1 className="text-xl font-bold text-black md:whitespace-nowrap">{title}</h1>
         </div>
         {/* Center: Search Box */}
         <div className="flex justify-center">
@@ -377,9 +379,10 @@ const NavBar = ({
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="font-semibold text-base flex items-center gap-2"
+                aria-label="Choose neighborhood"
+                className="font-semibold text-sm md:text-base flex items-center gap-2"
               >
-                {selectedNeighborhood}
+                {IS_DEMO && selectedNeighborhood === "Seattle" ? "All Seattle" : selectedNeighborhood}
                 <ChevronDown className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -414,13 +417,13 @@ const NavBar = ({
               {/* Default Neighborhoods */}
               {(!searchTerm || searchTerm.length <= 2) && (
                 <>
-                  {defaultNeighborhoods.map((neighborhood) => (
+                  {(IS_DEMO ? demoNeighborhoods : defaultNeighborhoods).map((neighborhood) => (
                     <DropdownMenuItem
                       key={neighborhood.value}
-                      onClick={() => handleNeighborhoodChange(neighborhood.name)}
+                      onClick={() => handleNeighborhoodChange(neighborhood.value)}
                       className={cn(
                         "cursor-pointer text-sm py-2 px-3 rounded-md hover:bg-gray-100 transition-colors",
-                        selectedNeighborhood === neighborhood.name && "bg-gray-100 font-medium"
+                        selectedNeighborhood === neighborhood.value && "bg-gray-100 font-medium"
                       )}
                     >
                       {neighborhood.name}

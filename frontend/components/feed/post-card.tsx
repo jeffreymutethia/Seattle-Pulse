@@ -18,6 +18,7 @@ import {
 import { ExtendedPost } from "@/app/types/content";
 import { REACTIONS } from "@/lib/constants";
 import { useTimeAgo } from "@/app/hooks/use-time-ago";
+import { IS_DEMO } from "@/lib/demo";
 
 // const ReactPlayer = dynamic(() => import("react-player"), {
 //   ssr: false,
@@ -69,6 +70,7 @@ export function PostCard({
 
   // Handle user profile click
   const handleUserProfileClick = () => {
+    if (IS_DEMO) return;
     if (isAuthenticated) {
       // Normal behavior - navigate to user profile
       router.push(`/profile/${post.user.username}`);
@@ -130,7 +132,7 @@ export function PostCard({
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center gap-3">
           <div
-            className="flex items-center gap-3 cursor-pointer"
+            className={`flex items-center gap-3 ${IS_DEMO ? "" : "cursor-pointer"}`}
             onClick={handleUserProfileClick}
           >
             <AvatarWithFallback
@@ -168,7 +170,7 @@ export function PostCard({
             <span className="truncate">{post.location}</span>
           </div>
 
-          <DropdownMenu>
+          {!IS_DEMO && <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">
                 <MoreHorizontal className="h-4 w-4" />
@@ -231,7 +233,7 @@ export function PostCard({
                 </>
               )}
             </DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu>}
         </div>
       </div>
 
@@ -275,7 +277,7 @@ export function PostCard({
 
       {/* Title / Body */}
       <div className="px-4 py-2">
-        {/* <h4 className="font-semibold mb-2">{post.title}</h4> */}
+        {IS_DEMO && <button data-cy="open-discussion" onClick={() => onOpenComments("user_content", post.id)} className="mb-2 text-left text-lg font-semibold leading-snug text-gray-950 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">{post.title}</button>}
         <p>{post.body}</p>
       </div>
 
@@ -309,6 +311,11 @@ export function PostCard({
 
       {/* Buttons Row */}
       <div className="flex items-center gap-0 p-4">
+        {IS_DEMO ? (
+          <Button data-cy="comment-button" variant="outline" className="gap-2 rounded-full" onClick={() => onOpenComments("user_content", post.id)} aria-label={`Read discussion: ${post.title}`}>
+            <MessageCircle className="h-4 w-4" /> Read discussion <span className="text-gray-500">· {post.comments_count}</span>
+          </Button>
+        ) : <>
         {/* Reaction button with popover */}
         <div
           className="relative"
@@ -427,6 +434,7 @@ export function PostCard({
             />
           </Button>
         </motion.div>
+        </>}
       </div>
     </div>
   );

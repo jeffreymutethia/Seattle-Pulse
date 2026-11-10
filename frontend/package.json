@@ -7,9 +7,9 @@
     "build": "NEXT_PUBLIC_GIT_SHA=$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown') next build",
     "build:local": "NEXT_PUBLIC_GIT_SHA=$(git rev-parse --short HEAD 2>/dev/null || echo 'local') next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint app components lib --ext .ts,.tsx",
     "export": "next export",
-    "lint:fix": "next lint --fix",
+    "lint:fix": "npm run lint -- --fix",
     "test": "cypress run",
     "cypress:open": "cypress open",
     "cypress:open:electron": "cypress open --browser electron",
@@ -21,7 +21,12 @@
     "test:e2e:firefox": "start-server-and-test dev http://localhost:3000 cypress:run:firefox",
     "test:e2e:electron": "start-server-and-test dev http://localhost:3000 cypress:run:electron",
     "start:prod": "next start -p 3000",
-    "perf": "npm run build && npm run start:prod"
+    "perf": "npm run build && npm run start:prod",
+    "test:demo": "start-server-and-test serve:demo http://127.0.0.1:3000 test:demo:preview",
+    "test:demo:preview": "cypress run --config-file cypress.demo.config.ts --browser chrome",
+    "build:demo": "node scripts/prepare-demo-assets.mjs && NEXT_PUBLIC_DEMO_MODE=true next build demo",
+    "serve:demo": "python3 -m http.server 3000 --bind 127.0.0.1 --directory demo/out",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",

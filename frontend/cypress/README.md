@@ -125,3 +125,35 @@ To add new tests:
 4. Commit the new spec and any fixtures after the tests pass.
 
 For additional guidance, see the [Cypress documentation](https://docs.cypress.io/).
+
+## Static demo browser check
+
+The dedicated spec uses the exported application and its bundled fixtures with
+no API stubs. One blocking journey runs in fresh desktop (1440 × 1000) and mobile
+(390 × 844) guest sessions and covers:
+
+- Eight-area **All Seattle** feed, distinct publisher images, neighborhood filtering and seeded discussion.
+- The original branded `/auth/login/` page, **Back to browsing**, and **Continue as demo reader**, preserving the selected neighborhood.
+- Browser-local comments and source following; My Pulse begins with three followed sources and changes when one is unfollowed.
+- Real **The Feed**, **My Pulse**, and **Profile** routes, active navigation, populated profile content, direct URLs and signed-in reloads.
+- Decoded images and same-origin resources, with no live backend or socket requests.
+
+```sh
+npm run build:demo
+npm run test:demo
+```
+
+Run the same check against a deployment:
+
+```sh
+CYPRESS_BASE_URL=https://seattle-pulse-demo.vercel.app npm run test:demo:preview
+```
+
+The browser configuration uses installed Google Chrome. If this host inherits
+`ELECTRON_RUN_AS_NODE`, prefix the command with `env -u ELECTRON_RUN_AS_NODE`.
+Screenshots leave Cypress timer freezing disabled because freezing can trip a
+React 19 scheduling invariant; uncaught application exceptions remain failures.
+
+The `Demo walkthrough (desktop + mobile)` CI job is blocking. Screenshots are
+saved in `cypress/screenshots` and uploaded as a CI artifact on every run. A
+repository owner can select the named job as a required branch-protection check.
